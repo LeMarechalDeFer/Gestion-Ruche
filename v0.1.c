@@ -1,5 +1,11 @@
 //Modelisation d'une ruche d'abeille allant jusqu'à 60 000 abeilles
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+
+
 // Constantes pour la reine
 #define DUREE_VIE_MAX_REINE 1825 // 5 ans en jours
 #define PONTE_MAX_JOUR 2000 // Nombre maximal d'œufs pondus par jour par la reine
@@ -143,7 +149,6 @@ typedef struct Statistiques {
     int nombreAbeillesNettoyeuses; // Nombre total d'abeilles nettoyeuses
     int nombreAbeillesMagasiniere; // Nombre total d'abeilles magasiniere
     int nombreAbeillesFauxBourdons; // Nombre total de faux bourdons
-    
 
     int niveauMenace; // Indicateur de menaces potentielles (prédateurs, maladies)
     int niveauSanteGlobale; // Santé globale de la ruche
@@ -204,6 +209,8 @@ void effectuerTache(Ouvriere* ouvriere) {
 
 void miseAJourSanteEfficacite(Ouvriere* ouvriere) {
     // Ajoutez ici la logique pour ajuster santé et efficacité
+
+    
 }
 
 //Relatif à la simulation de la ruche
@@ -218,12 +225,14 @@ void simulerEnvironnement(Ruche* ruche) {
     // Peut influencer la disponibilité des ressources, la santé des abeilles, etc.
 }
 
-void gererEvenements(Ruche* ruche) {
+void gererEvenements(Ruche* ruche) 
+{
     // Logique pour gérer des événements comme des attaques de prédateurs, des maladies, etc.
     // Ajuster le niveau de menace et prendre des mesures en conséquence
 }
 
-void evaluerSanteAbeilles(Ruche* ruche) {
+void evaluerSanteAbeilles(Ruche* ruche)
+{
     // Évaluer la santé globale des abeilles
     // Prendre des mesures pour traiter les maladies ou améliorer les conditions
 }
@@ -231,7 +240,8 @@ void evaluerSanteAbeilles(Ruche* ruche) {
 
 
 void simulationJour(Ruche* ruche) {
-    for (int i = 0; i < nombreOuvrieres; i++) {
+    for (int i = 0; i < NOMBRE_MAX_OUVRIERES; i++) 
+    {
         Ouvriere* ouvriere = &(ruche->ouvrieres[i]);
         ouvriere->age++;
         miseAJourSanteEfficacite(&(ruche->ouvrieres[i]));
@@ -241,13 +251,5 @@ void simulationJour(Ruche* ruche) {
     gererStockNourriture(ruche);
     simulerEnvironnement(ruche);
     gererEvenements(ruche);
-
-}
-
-
-
-
-
-int main(){
 
 }
