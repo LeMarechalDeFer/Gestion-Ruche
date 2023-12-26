@@ -50,6 +50,16 @@ typedef struct Reine {
 } Reine;
 
 
+typedef enum RoleOuvriere {
+    NETTOYEUSE,
+    NOURRICE,
+    MAGASINIERE,
+    CIRIERE,
+    VENTILEUSE,
+    GARDIENNE,
+    BUTINEUSE
+} RoleOuvriere;
+
 typedef struct Ouvriere {
     int age; // Age en jours
     int dureeVieMax; // Durée de vie maximale en jours
@@ -66,29 +76,6 @@ typedef struct FauxBourdon {
     int enQueteReine; // Indique s'il est en quête de reproduction
 } FauxBourdon;
 
-typedef enum RoleOuvriere {
-    NETTOYEUSE,
-    NOURRICE,
-    MAGASINIERE,
-    CIRIERE,
-    VENTILEUSE,
-    GARDIENNE,
-    BUTINEUSE
-} RoleOuvriere;
-
-typedef struct Ruche {
-    Reine* reine; // Pointeur vers la reine
-    Ouvriere* ouvrieres; // Pointer vers un tableau ou une liste chaînée
-    FauxBourdon* faux_bourdons; // Pointer vers un tableau ou une liste chaînée
-    CelluleCouvain* cellulesCouvain; // Ajout de la structure des cellules de couvain
-    CelluleStockage* cellulesStockage; // Ajout de la structure des cellules de stockage
-    BesoinsRuche besoins; // Besoins en humidité et température
-    EntreeRuche entree; // Nombre d'abeilles entrant et sortant
-    SystemeVentilation ventilation; // Nombre d'abeilles ventilant la ruche
-    ZoneRepos repos; // Nombre d'abeilles pouvant se reposer
-    Statistiques stats; // Statistiques sur la ruche
-
-} Ruche;
 
 typedef struct CelluleCouvain {
     int oeufs; // Nombre d'œufs
@@ -154,6 +141,23 @@ typedef struct Statistiques {
     int niveauSanteGlobale; // Santé globale de la ruche
     
 } Statistiques;
+
+
+
+typedef struct Ruche {
+    Reine* reine; // Pointeur vers la reine
+    Ouvriere* ouvrieres; // Pointer vers un tableau ou une liste chaînée
+    FauxBourdon* faux_bourdons; // Pointer vers un tableau ou une liste chaînée
+    CelluleCouvain* cellulesCouvain; // Ajout de la structure des cellules de couvain
+    CelluleStockage* cellulesStockage; // Ajout de la structure des cellules de stockage
+    BesoinsRuche besoins; // Besoins en humidité et température
+    EntreeRuche entree; // Nombre d'abeilles entrant et sortant
+    SystemeVentilation ventilation; // Nombre d'abeilles ventilant la ruche
+    ZoneRepos repos; // Nombre d'abeilles pouvant se reposer
+    Statistiques stats; // Statistiques sur la ruche
+
+} Ruche;
+
 
 void mettreAJourRole(Ouvriere* ouvriere) {
     if (ouvriere->age >= 1 && ouvriere->age <= 3) {
@@ -252,4 +256,13 @@ void simulationJour(Ruche* ruche) {
     simulerEnvironnement(ruche);
     gererEvenements(ruche);
 
+}
+
+void initialisation_Ruche(){
+    
+}
+
+int main(int argc, char argv[]){
+    
+    return 0;
 }
