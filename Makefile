@@ -8,10 +8,10 @@ CC = gcc
 CFLAGS = -Wall -Wextra -g 
 
 # Dépendances (headers)
-DEPS = abeille.h ruche.h
+DEPS = abeille.h ruche.h SDL.h
 
 # Objets
-OBJ = abeille.o ruche.o main.o
+OBJ = abeille.o ruche.o main.o SDL.o
 
 # Règle pour générer les fichiers objets (.o)
 %.o: %.c $(DEPS)
