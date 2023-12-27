@@ -98,6 +98,16 @@ Initialisation du monde extérieur
     Essaim 
         Une reine part avec d'autre ouvrieres
 
+         mon programme :
+le main doit faire dans cette ordre:
+-initialisation sdl ;
+-initialisation mémoir des structure ;
+-donner attributs ;
+-inserer table de hachage ;
+-effectuer autant de cycle journalier que possible avec à l'interieur mise a jour des role et ajouter et supprimer abeille, et effectuation des role ;
+- Liberation de la mémoire;
+- fin programe ;
+
 */
 
 

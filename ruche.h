@@ -16,10 +16,19 @@
 #define CAPACITE_MAX_MIEL_CELLULE 1000 // En grammes
 #define CAPACITE_MAX_GELEE_ROYALE_CELLULE 100 // En grammes
 #define CAPACITE_MAX_EAU_CELLULE 250 // En millilitres
+// capacité d'insectes  
+#define NOMBRE_MAX_OUVRIERES 60000 // Nombre maximal d'ouvrières dans la ruche (en fonction de la taille de la ruche )
+#define NOMBRE_MAX_FAUX_BOURDONS 2000 // Nombre maximal de faux bourdons 
+
 
 // Constantes pour les besoins de la ruche
 #define HUMIDITE_IDEAL 80 // Pourcentage d'humidité idéale
 #define TEMPERATURE_IDEAL 35 // Température idéale en degrés Celsius
+
+// Points de vies de la Ruche
+#define POINT_MAX_DE_VIE_RUCHE_MAX 500 //nbr de points de vie de la ruche max
+#define POINT_MIN_DE_VIE_RUCHE_MIN 0 //nbr de points de vie de la ruche min 
+
 
 
 typedef struct Ruche {
