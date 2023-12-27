@@ -35,23 +35,19 @@
 #define EFFICACITER_PAR_DEFAUT 50
 
 
-// Constantes pour la cellule de stockage
 #define CAPACITE_MAX_POLLEN_CELLULE_G 500 
 #define CAPACITE_MAX_MIEL_CELLULE_g 1000 
 #define CAPACITE_MAX_GELEE_ROYALE_CELLULE_G 100 
 #define CAPACITE_MAX_EAU_CELLULE_ML 250 
 
-// capacité d'insectes  
 #define NOMBRE_MAX_OUVRIERES 60000 
 #define NOMBRE_MAX_FAUX_BOURDONS 2000 
 
-// Constantes pour les besoins de la ruche
 #define HUMIDITE_IDEAL 80 
 #define TEMPERATURE_IDEAL 35 
 
-// Points de vies de la Ruche
-#define SANTE_RUCHE_MAX 500//nbr de points de vie de la ruche max
-#define SANTE_RUCHE_MIN 0 //nbr de points de vie de la ruche min 
+#define SANTE_RUCHE_MAX 500
+#define SANTE_RUCHE_MIN 0 
 
 typedef struct Ruche {
     Reine* reine; 
