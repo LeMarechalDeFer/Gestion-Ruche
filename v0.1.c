@@ -258,11 +258,11 @@ void simulationJour(Ruche* ruche) {
 
 }
 
-void initialisation_Ruche(){
+pRuche initialisation_Ruche(){
     
 }
 
 int main(int argc, char argv[]){
-    
+    Ruche ruche = initialisation_Ruche(ruche)
     return 0;
 }
