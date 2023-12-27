@@ -69,28 +69,62 @@ const char* RoleOuvriereStrings[] = {
     "LARVE", "NETTOYEUSE", "NOURRICE", "MAGASINIERE", "CIRIERE", "VENTILEUSE", "GARDIENNE", "BUTINEUSE"
 };
 
+typedef enum Pheromones {
+    INCITATRICE,
+    MODIFICATRICE
+} Pheromones;
+
+
+typedef enum TypeInsecte{
+    TYPE_REINE,
+    TYPE_OUVRIERE,
+    TYPE_FAUX_BOURDON,
+    TYPE_OURSE,
+    TYPE_GUEPE
+} TypeInsecte;
+
+typedef struct Reine {
+    bool ponteJournaliere;  
+    bool emmet_feromones; 
+} Reine;
 
 typedef struct Ouvriere{
-    unsigned int id;
-    unsigned int age; 
-    unsigned int sante; 
     unsigned int cohesion;
-    bool faim;
     unsigned int efficacite; 
     unsigned int experience; 
     RoleOuvriere role;
+} Ouvriere;
 
-    struct Ouvriere *next ;
-    struct Ouvriere *previous ;
-}Ouvriere, *ListOuvrieres ;
+typedef struct FauxBourdon {
+    bool feromones;
+    bool enQueteReine;
+} FauxBourdon;
+
+typedef struct Insecte {
+    unsigned int id;
+    unsigned int sante; 
+    unsigned int age; 
+    bool faim;
+    TypeInsecte type; 
+    union {
+        Reine reine;
+        Ouvriere ouvriere;
+        FauxBourdon FauxBourdon;
+    } data;
+    struct Insecte *next;
+    struct Insecte *previous;
+} Insecte, *ListeInsectes;
 
 
-ListOuvrieres new_list(void){
+
+
+
+ListeInsectes new_list(void){
     return NULL;
 }
 
-bool is_empty_list(ListOuvrieres listeOuvrieres){
-    if(listeOuvrieres == NULL){
+bool is_empty_list(ListeInsectes listeInsectes){
+    if(listeInsectes == NULL){
         return(true);
     }
     else{
@@ -98,98 +132,134 @@ bool is_empty_list(ListOuvrieres listeOuvrieres){
     }
 }
 
-int list_length(ListOuvrieres listeOuvrieres){
+int list_length(ListeInsectes listeInsectes){
     int length = 0;
 
-    if(!is_empty_list(listeOuvrieres)){
-        while(listeOuvrieres != NULL){
+    if(!is_empty_list(listeInsectes)){
+        while(listeInsectes != NULL){
             length += 1;
-            listeOuvrieres = listeOuvrieres->next ;
+            listeInsectes = listeInsectes->next ;
         }
     }
     return length ;
 }
 
-void print_list(ListOuvrieres listeOuvrieres){
-    if(is_empty_list(listeOuvrieres)){
+void print_list(ListeInsectes listeInsectes){  
+    if(is_empty_list(listeInsectes)){
         printf("La liste est vide\n");
     }
     else{
-        while(listeOuvrieres != NULL){
-            printf("Id: %1d : age(en J): %u : sante: %u : cohesion: %u : faim: %s : efficacite: %u : experience: %u : role: %s\n", 
-                    listeOuvrieres->id, 
-                    listeOuvrieres->age, 
-                    listeOuvrieres->sante, 
-                    listeOuvrieres->cohesion, 
-                    listeOuvrieres->faim ? "Vrai" : "Faux", 
-                    listeOuvrieres->efficacite, 
-                    listeOuvrieres->experience, 
-                    RoleOuvriereStrings[listeOuvrieres->role]);
-            listeOuvrieres = listeOuvrieres->next ; 
+        while(listeInsectes != NULL){
+            printf("ID: %u, Age: %u, Sante: %u, Faim: %s, ", 
+                    listeInsectes->id,
+                    listeInsectes->age, 
+                    listeInsectes->sante, 
+                    listeInsectes->faim ? "Vrai" : "Faux");
+            switch(listeInsectes->type) {
+                case TYPE_REINE:
+                    printf("Type: Reine, Ponte Journaliere: %u, Cohesion: %u, Emet Feromones: %s\n",
+                           listeInsectes->data.reine.ponteJournaliere,
+                           listeInsectes->data.reine.emmet_feromones ? "Oui" : "Non");
+                    break;
+                case TYPE_OUVRIERE:
+                    printf("Type: Ouvriere, Cohésion: %u, Efficacite: %u, Experience: %u, Role: %s\n",
+                            listeInsectes->data.ouvriere.cohesion,
+                            listeInsectes->data.ouvriere.efficacite,
+                            listeInsectes->data.ouvriere.experience,
+                            RoleOuvriereStrings[listeInsectes->data.ouvriere.role]);
+                    break;
+                case TYPE_FAUX_BOURDON:
+                    printf("Type: Faux Bourdon, Féromones: %s, En quete de Reine: %s\n",
+                            listeInsectes->data.FauxBourdon.feromones ? "Oui" : "Non",
+                            listeInsectes->data.FauxBourdon.enQueteReine ? "Oui" : "Non");
+                    break;
+            }
+            listeInsectes = listeInsectes->next ; 
         }
         printf("\n");
     }
-} 
-
-
-
-ListOuvrieres NAISSANCE_push_front_list(ListOuvrieres listeOuvrieres){
-    ListOuvrieres nouvelleOuvriere = malloc(sizeof(Ouvriere));
-    if(nouvelleOuvriere == NULL){
-        perror("Erreur aloocation mémoire\n");
-        exit(EXIT_FAILURE);
-    }
-    nouvelleOuvriere->id = rand() % ID_MAX;
-    nouvelleOuvriere->age = 0 ;
-    nouvelleOuvriere->cohesion = COHESION_MAX ;
-    nouvelleOuvriere->efficacite = EFFICACITER_PAR_DEFAUT ;
-    nouvelleOuvriere->experience = 0 ;
-    nouvelleOuvriere->faim = false ;
-    nouvelleOuvriere->role = LARVE ;
-    nouvelleOuvriere->sante = SANTE_MAX ;
-
-    nouvelleOuvriere->next = listeOuvrieres; 
-    nouvelleOuvriere->previous = NULL; 
-
-    if(!is_empty_list(listeOuvrieres)){
-        listeOuvrieres->previous = nouvelleOuvriere; 
-    }
-
-    return nouvelleOuvriere ;
 }
 
 
-ListOuvrieres GENERATION_push_front_list(ListOuvrieres listeOuvrieres, unsigned int age, unsigned int sante, unsigned int cohesion, bool faim, unsigned int efficacite, unsigned int experience, RoleOuvriere role ){
-    ListOuvrieres nouvelleOuvriere = malloc(sizeof(Ouvriere));
-    if(nouvelleOuvriere == NULL){
-        perror("Erreur aloocation mémoire\n");
+
+
+// ListeInsectes GENERATION_push_front_list(ListeInsectes listeOuvrieres, unsigned int age, unsigned int sante, unsigned int cohesion, bool faim, unsigned int efficacite, unsigned int experience, RoleOuvriere role ){
+//     ListeInsectes nouvelleOuvriere = malloc(sizeof(Ouvriere));
+//     if(nouvelleOuvriere == NULL){
+//         perror("Erreur aloocation mémoire\n");
+//         exit(EXIT_FAILURE);
+//     }
+//     nouvelleOuvriere->id = rand() % ID_MAX;
+//     nouvelleOuvriere->age = age ; 
+//     nouvelleOuvriere->cohesion = cohesion ;
+//     nouvelleOuvriere->efficacite = efficacite ; 
+//     nouvelleOuvriere->experience = experience; 
+//     nouvelleOuvriere->faim = faim ; 
+//     nouvelleOuvriere->role = role ; 
+//     nouvelleOuvriere->sante = sante ; 
+
+//     nouvelleOuvriere->next = listeOuvrieres; 
+//     nouvelleOuvriere->previous = NULL; 
+
+//     if(!is_empty_list(listeOuvrieres)){
+//         listeOuvrieres->previous = nouvelleOuvriere; 
+//     }
+
+//     return nouvelleOuvriere ;
+//}
+
+ListeInsectes GENERATION_push_front_list(ListeInsectes liste, 
+                                        TypeInsecte type, 
+                                        RoleOuvriere role,
+                                        unsigned int age, 
+                                        unsigned int sante, 
+                                        bool faim){
+    ListeInsectes nouvelInsecte = malloc(sizeof(Insecte));
+    if(nouvelInsecte == NULL){
+        perror("Erreur allocation mémoire\n");
         exit(EXIT_FAILURE);
     }
-    nouvelleOuvriere->id = rand() % ID_MAX;
-    nouvelleOuvriere->age = age ;
-    nouvelleOuvriere->cohesion = cohesion ;
-    nouvelleOuvriere->efficacite = efficacite ;
-    nouvelleOuvriere->experience = experience;
-    nouvelleOuvriere->faim = faim ;
-    nouvelleOuvriere->role = role ;
-    nouvelleOuvriere->sante = sante ;
+    nouvelInsecte->id = rand() % ID_MAX; 
+    nouvelInsecte->age = age;
+    nouvelInsecte->sante = sante;
+    nouvelInsecte->faim = faim;
+    nouvelInsecte->type = type;
 
-    nouvelleOuvriere->next = listeOuvrieres; 
-    nouvelleOuvriere->previous = NULL; 
-
-    if(!is_empty_list(listeOuvrieres)){
-        listeOuvrieres->previous = nouvelleOuvriere; 
+    switch(type){
+        case TYPE_REINE:
+            nouvelInsecte->data.reine.ponteJournaliere = true; 
+            nouvelInsecte->data.reine.emmet_feromones = true; 
+            break;
+        case TYPE_OUVRIERE:
+            nouvelInsecte->data.ouvriere.cohesion = COHESION_MAX; 
+            nouvelInsecte->data.ouvriere.efficacite = EFFICACITER_PAR_DEFAUT; 
+            nouvelInsecte->data.ouvriere.experience = 0; 
+            nouvelInsecte->data.ouvriere.role = role;
+            break;
+        case TYPE_FAUX_BOURDON:
+            nouvelInsecte->data.FauxBourdon.feromones = true; 
+            nouvelInsecte->data.FauxBourdon.enQueteReine = false; 
+            break;
+        
     }
 
-    return nouvelleOuvriere ;
+    // Gestion de la liste chaînée
+    nouvelInsecte->next = liste;
+    if(liste != NULL){
+        liste->previous = nouvelInsecte;
+    }
+    nouvelInsecte->previous = NULL;
+
+    return nouvelInsecte; // Retourner la nouvelle tête de la liste
 }
+
 
 /*
 LARVE 20%, NETTOYEUSE 5%, NOURRICE 15, MAGASINIERE 10%, CIRIERE 10%, VENTILEUSE 5%, GARDIENNE 2%, BUTINEUSE 33%
 */
 
 
-ListOuvrieres initialisationEssaim(ListOuvrieres listeOuvrieres, unsigned int nbOuvrieres){
+ListeInsectes initialisationEssaim(ListeInsectes listeOuvrieres, unsigned int nbOuvrieres){
     unsigned int i ;
     unsigned int nbLarves = (nbOuvrieres * 20) / 100; // 20%
     unsigned int nbNettoyeuses = (nbOuvrieres * 5) / 100; // 5%
@@ -230,8 +300,8 @@ ListOuvrieres initialisationEssaim(ListOuvrieres listeOuvrieres, unsigned int nb
 
 
 
-ListOuvrieres pop_front_list(ListOuvrieres listeOuvrieres){
-    ListOuvrieres nouvelleTete = malloc(sizeof(Ouvriere));
+ListeInsectes pop_front_list(ListeInsectes listeOuvrieres){
+    ListeInsectes nouvelleTete = malloc(sizeof(Ouvriere));
     if(nouvelleTete == NULL){
         perror("Erreur allocation mémoire\n");
         exit(EXIT_FAILURE);
@@ -252,7 +322,7 @@ ListOuvrieres pop_front_list(ListOuvrieres listeOuvrieres){
 
 }
 
-ListOuvrieres clear_list(ListOuvrieres listeOuvrieres){
+ListeInsectes clear_list(ListeInsectes listeOuvrieres){
     if(is_empty_list(listeOuvrieres)){
         return new_list() ;
     }
@@ -268,7 +338,7 @@ ListOuvrieres clear_list(ListOuvrieres listeOuvrieres){
 
 int main(){
     srand(time(NULL));
-    ListOuvrieres maRuche = new_list();
+    ListeInsectes maRuche = new_list();
     
     print_list(maRuche);
     maRuche = initialisationEssaim(maRuche, 100);
