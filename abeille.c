@@ -157,7 +157,7 @@ void print_list(ListeInsectes listeInsectes){
                     listeInsectes->faim ? "Vrai" : "Faux");
             switch(listeInsectes->type) {
                 case TYPE_REINE:
-                    printf("Type: Reine, Ponte Journaliere: %u, Cohesion: %u, Emet Feromones: %s\n",
+                    printf("Type: Reine, Ponte Journaliere: %u, Emet Feromones: %s\n",
                            listeInsectes->data.reine.ponteJournaliere,
                            listeInsectes->data.reine.emmet_feromones ? "Oui" : "Non");
                     break;
@@ -208,7 +208,7 @@ void print_list(ListeInsectes listeInsectes){
 //     return nouvelleOuvriere ;
 //}
 
-ListeInsectes GENERATION_push_front_list(ListeInsectes liste, 
+ListeInsectes GENERATION_push_front_list(ListeInsectes listeInsectes, 
                                         TypeInsecte type, 
                                         RoleOuvriere role,
                                         unsigned int age, 
@@ -244,9 +244,9 @@ ListeInsectes GENERATION_push_front_list(ListeInsectes liste,
     }
 
     // Gestion de la liste chaînée
-    nouvelInsecte->next = liste;
-    if(liste != NULL){
-        liste->previous = nouvelInsecte;
+    nouvelInsecte->next = listeInsectes;
+    if(listeInsectes != NULL){
+        listeInsectes->previous = nouvelInsecte;
     }
     nouvelInsecte->previous = NULL;
 
@@ -259,8 +259,49 @@ LARVE 20%, NETTOYEUSE 5%, NOURRICE 15, MAGASINIERE 10%, CIRIERE 10%, VENTILEUSE 
 */
 
 
-ListeInsectes initialisationEssaim(ListeInsectes listeOuvrieres, unsigned int nbOuvrieres){
-    unsigned int i ;
+// ListeInsectes initialisationEssaim(ListeInsectes listeInsectes, unsigned int nbOuvrieres){
+//     unsigned int i ;
+//     unsigned int nbLarves = (nbOuvrieres * 20) / 100; // 20%
+//     unsigned int nbNettoyeuses = (nbOuvrieres * 5) / 100; // 5%
+//     unsigned int nbNourrices = (nbOuvrieres * 15) / 100; // 15%
+//     unsigned int nbMagasinieres = (nbOuvrieres * 10) / 100; // 10%
+//     unsigned int nbCirieres = (nbOuvrieres * 10) / 100; // 10%
+//     unsigned int nbVentileuses = (nbOuvrieres * 5) / 100; // 5%
+//     unsigned int nbGardiennes = (nbOuvrieres * 2) / 100; // 2%
+//     unsigned int nbButineuses = (nbOuvrieres * 33) / 100; // 33%
+
+    
+
+//     for( i = 0; i < nbLarves; i++){
+//         listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, LARVE);
+//     }
+//     for( i = 0; i < nbNettoyeuses; i++){
+//         listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, NETTOYEUSE);
+//     }
+//     for( i = 0; i < nbNourrices; i++){
+//         listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, NOURRICE);
+//     }
+//     for( i = 0; i < nbMagasinieres; i++){
+//         listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, MAGASINIERE);
+//     }
+//     for( i = 0; i < nbCirieres; i++){
+//         listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, CIRIERE);
+//     }
+//     for( i = 0; i < nbVentileuses; i++){
+//         listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, VENTILEUSE);
+//     }
+//     for( i = 0; i < nbGardiennes; i++){
+//         listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, GARDIENNE);
+//     }
+//     for( i = 0; i < nbButineuses; i++){
+//         listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, BUTINEUSE);
+//     }
+//     return listeOuvrieres ;
+
+// }
+
+ListeInsectes initialisationEssaim(ListeInsectes listeInsectes, unsigned int nbOuvrieres) {
+    unsigned int i;
     unsigned int nbLarves = (nbOuvrieres * 20) / 100; // 20%
     unsigned int nbNettoyeuses = (nbOuvrieres * 5) / 100; // 5%
     unsigned int nbNourrices = (nbOuvrieres * 15) / 100; // 15%
@@ -269,51 +310,57 @@ ListeInsectes initialisationEssaim(ListeInsectes listeOuvrieres, unsigned int nb
     unsigned int nbVentileuses = (nbOuvrieres * 5) / 100; // 5%
     unsigned int nbGardiennes = (nbOuvrieres * 2) / 100; // 2%
     unsigned int nbButineuses = (nbOuvrieres * 33) / 100; // 33%
+    unsigned int nbFauxBourdon = (nbOuvrieres * 5) / 100;
 
-    for( i = 0; i < nbLarves; i++){
-        listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, LARVE);
+    listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_REINE, 0, 0, SANTE_MAX, false);
+    
+    for(i = 0; i < nbLarves; i++) {
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, LARVE, 0, SANTE_MAX, false);
     }
-    for( i = 0; i < nbNettoyeuses; i++){
-        listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, NETTOYEUSE);
+    for(i = 0; i < nbNettoyeuses; i++) {
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, NETTOYEUSE, 0, SANTE_MAX, false);
     }
-    for( i = 0; i < nbNourrices; i++){
-        listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, NOURRICE);
+    for(i = 0; i < nbNourrices; i++) {
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, NOURRICE, 0, SANTE_MAX, false);
     }
-    for( i = 0; i < nbMagasinieres; i++){
-        listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, MAGASINIERE);
+    for(i = 0; i < nbMagasinieres; i++) {
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, MAGASINIERE, 0, SANTE_MAX, false);
     }
-    for( i = 0; i < nbCirieres; i++){
-        listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, CIRIERE);
+    for(i = 0; i < nbCirieres; i++) {
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, CIRIERE, 0, SANTE_MAX, false);
     }
-    for( i = 0; i < nbVentileuses; i++){
-        listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, VENTILEUSE);
+    for(i = 0; i < nbVentileuses; i++) {
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, VENTILEUSE, 0, SANTE_MAX, false);
     }
-    for( i = 0; i < nbGardiennes; i++){
-        listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, GARDIENNE);
+    for(i = 0; i < nbGardiennes; i++) {
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, GARDIENNE, 0, SANTE_MAX, false);
     }
-    for( i = 0; i < nbButineuses; i++){
-        listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, BUTINEUSE);
+    for(i = 0; i < nbButineuses; i++) {
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, BUTINEUSE, 0, SANTE_MAX, false);
     }
-    return listeOuvrieres ;
 
+    for(i=0; i< nbFauxBourdon; i++ ){
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_FAUX_BOURDON, 0, 0, SANTE_MAX, false);
+    }
+
+    return listeInsectes;
 }
 
 
-
-ListeInsectes pop_front_list(ListeInsectes listeOuvrieres){
+ListeInsectes pop_front_list(ListeInsectes listeInsectes){
     ListeInsectes nouvelleTete = malloc(sizeof(Ouvriere));
     if(nouvelleTete == NULL){
         perror("Erreur allocation mémoire\n");
         exit(EXIT_FAILURE);
     }
 
-    if(is_empty_list(listeOuvrieres)){
+    if(is_empty_list(listeInsectes)){
         return new_list();
     }
 
-    nouvelleTete = listeOuvrieres->next ; 
-    free(listeOuvrieres);
-    listeOuvrieres = NULL;
+    nouvelleTete = listeInsectes->next ; 
+    free(listeInsectes);
+    listeInsectes = NULL;
     if(!is_empty_list(nouvelleTete)){
         nouvelleTete->previous = NULL;
     }
@@ -322,15 +369,15 @@ ListeInsectes pop_front_list(ListeInsectes listeOuvrieres){
 
 }
 
-ListeInsectes clear_list(ListeInsectes listeOuvrieres){
-    if(is_empty_list(listeOuvrieres)){
+ListeInsectes clear_list(ListeInsectes listeInsectes){
+    if(is_empty_list(listeInsectes)){
         return new_list() ;
     }
     else{
-        while(listeOuvrieres != NULL){
-            listeOuvrieres = pop_front_list(listeOuvrieres);
+        while(listeInsectes != NULL){
+            listeInsectes = pop_front_list(listeInsectes);
         }
-        return listeOuvrieres;
+        return listeInsectes;
     }
 }
 
