@@ -53,6 +53,32 @@
 #define SANTE_RUCHE_MAX 500
 #define SANTE_RUCHE_MIN 0 
 
+typedef enum Saisons {
+    PRINTEMPS,
+    ETE,
+    AUTOMNE,
+    HIVER
+} Saisons;
+
+
+typedef struct Ruche {
+    float temperature;
+    float humidite;
+    float salete;
+
+    unsigned int sante;
+
+    unsigned int reserveMiel;
+    unsigned int reserveEau;
+    unsigned int reservePollen;
+    unsigned int reserveGeleeRoyale;
+
+    unsigned int nombreOuvrieres;
+    unsigned int nombreFauxBourdon;
+    unsigned int jourNumero;
+    Saisons saison;
+    
+} Ruche;
 
 typedef enum RoleOuvriere {
     LARVE,
@@ -154,11 +180,11 @@ void print_list(ListeInsectes listeInsectes){
                     listeInsectes->id,
                     listeInsectes->age, 
                     listeInsectes->sante, 
-                    listeInsectes->faim ? "Vrai" : "Faux");
+                    listeInsectes->faim ? "Oui" : "Non");
             switch(listeInsectes->type) {
                 case TYPE_REINE:
-                    printf("Type: Reine, Ponte Journaliere: %u, Emet Feromones: %s\n",
-                           listeInsectes->data.reine.ponteJournaliere,
+                    printf("Type: Reine, Ponte Journaliere: %s, Emet Feromones: %s\n",
+                           listeInsectes->data.reine.ponteJournaliere ? "Oui" : "Non",
                            listeInsectes->data.reine.emmet_feromones ? "Oui" : "Non");
                     break;
                 case TYPE_OUVRIERE:
@@ -180,33 +206,6 @@ void print_list(ListeInsectes listeInsectes){
     }
 }
 
-
-
-
-// ListeInsectes GENERATION_push_front_list(ListeInsectes listeOuvrieres, unsigned int age, unsigned int sante, unsigned int cohesion, bool faim, unsigned int efficacite, unsigned int experience, RoleOuvriere role ){
-//     ListeInsectes nouvelleOuvriere = malloc(sizeof(Ouvriere));
-//     if(nouvelleOuvriere == NULL){
-//         perror("Erreur aloocation mémoire\n");
-//         exit(EXIT_FAILURE);
-//     }
-//     nouvelleOuvriere->id = rand() % ID_MAX;
-//     nouvelleOuvriere->age = age ; 
-//     nouvelleOuvriere->cohesion = cohesion ;
-//     nouvelleOuvriere->efficacite = efficacite ; 
-//     nouvelleOuvriere->experience = experience; 
-//     nouvelleOuvriere->faim = faim ; 
-//     nouvelleOuvriere->role = role ; 
-//     nouvelleOuvriere->sante = sante ; 
-
-//     nouvelleOuvriere->next = listeOuvrieres; 
-//     nouvelleOuvriere->previous = NULL; 
-
-//     if(!is_empty_list(listeOuvrieres)){
-//         listeOuvrieres->previous = nouvelleOuvriere; 
-//     }
-
-//     return nouvelleOuvriere ;
-//}
 
 ListeInsectes GENERATION_push_front_list(ListeInsectes listeInsectes, 
                                         TypeInsecte type, 
@@ -258,48 +257,6 @@ ListeInsectes GENERATION_push_front_list(ListeInsectes listeInsectes,
 LARVE 20%, NETTOYEUSE 5%, NOURRICE 15, MAGASINIERE 10%, CIRIERE 10%, VENTILEUSE 5%, GARDIENNE 2%, BUTINEUSE 33%
 */
 
-
-// ListeInsectes initialisationEssaim(ListeInsectes listeInsectes, unsigned int nbOuvrieres){
-//     unsigned int i ;
-//     unsigned int nbLarves = (nbOuvrieres * 20) / 100; // 20%
-//     unsigned int nbNettoyeuses = (nbOuvrieres * 5) / 100; // 5%
-//     unsigned int nbNourrices = (nbOuvrieres * 15) / 100; // 15%
-//     unsigned int nbMagasinieres = (nbOuvrieres * 10) / 100; // 10%
-//     unsigned int nbCirieres = (nbOuvrieres * 10) / 100; // 10%
-//     unsigned int nbVentileuses = (nbOuvrieres * 5) / 100; // 5%
-//     unsigned int nbGardiennes = (nbOuvrieres * 2) / 100; // 2%
-//     unsigned int nbButineuses = (nbOuvrieres * 33) / 100; // 33%
-
-    
-
-//     for( i = 0; i < nbLarves; i++){
-//         listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, LARVE);
-//     }
-//     for( i = 0; i < nbNettoyeuses; i++){
-//         listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, NETTOYEUSE);
-//     }
-//     for( i = 0; i < nbNourrices; i++){
-//         listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, NOURRICE);
-//     }
-//     for( i = 0; i < nbMagasinieres; i++){
-//         listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, MAGASINIERE);
-//     }
-//     for( i = 0; i < nbCirieres; i++){
-//         listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, CIRIERE);
-//     }
-//     for( i = 0; i < nbVentileuses; i++){
-//         listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, VENTILEUSE);
-//     }
-//     for( i = 0; i < nbGardiennes; i++){
-//         listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, GARDIENNE);
-//     }
-//     for( i = 0; i < nbButineuses; i++){
-//         listeOuvrieres = GENERATION_push_front_list(listeOuvrieres, 0, SANTE_MAX, COHESION_MAX, false, EFFICACITER_PAR_DEFAUT, 0, BUTINEUSE);
-//     }
-//     return listeOuvrieres ;
-
-// }
-
 ListeInsectes initialisationEssaim(ListeInsectes listeInsectes, unsigned int nbOuvrieres) {
     unsigned int i;
     unsigned int nbLarves = (nbOuvrieres * 20) / 100; // 20%
@@ -347,6 +304,7 @@ ListeInsectes initialisationEssaim(ListeInsectes listeInsectes, unsigned int nbO
 }
 
 
+
 ListeInsectes pop_front_list(ListeInsectes listeInsectes){
     ListeInsectes nouvelleTete = malloc(sizeof(Ouvriere));
     if(nouvelleTete == NULL){
@@ -376,6 +334,179 @@ ListeInsectes clear_list(ListeInsectes listeInsectes){
     else{
         while(listeInsectes != NULL){
             listeInsectes = pop_front_list(listeInsectes);
+        }
+        return listeInsectes;
+    }
+}
+
+// ON PROGRESS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+/*
+- Cycle de vie : naissance mort 
+- Cycle des saisons : Printemps Ete Automne Hiver
+- Activité journaliere de reine: 
+    - ponte larves
+    - auto-gestion/intelligence collective de la colonie 
+- Activité journaliere des ouvrieres avec ces sous categories
+- Activité journaliere faux bourdons
+- SDL
+- Ruche
+- Meteo
+- Prédateurs/ Nuisibles
+- Maladies 
+*/
+
+ListeInsectes cyclePondaisonReine(ListeInsectes listeInsectes, Saisons saison){
+    if(is_empty_list(listeInsectes)){
+        return new_list();
+    }
+    else{
+        while(listeInsectes != NULL){
+            if(listeInsectes->type == TYPE_REINE){
+                if(saison == PRINTEMPS || saison == ETE){
+                    listeInsectes->data.reine.ponteJournaliere = true;
+                }
+                // if(listeInsectes->data.reine.emmet_feromones){
+                //     //emission de feromones
+                // }
+            }
+            listeInsectes = listeInsectes->next ;
+        }
+        return listeInsectes;
+    }
+}
+
+// On assume un depart au debut printemps pour un maximum de ponte et de reserver de nourriture
+Saisons cycleSaison(unsigned int jourNumero){
+    jourNumero += 1;
+    if(jourNumero >= 1 && jourNumero <= 90){
+        return PRINTEMPS;
+    }
+    else if(jourNumero >= 91 && jourNumero <= 180){
+        return ETE;
+    }
+    else if(jourNumero >= 181 && jourNumero <= 270){
+        return AUTOMNE;
+    }
+    else if(jourNumero >= 271 && jourNumero <= 365){
+        return HIVER;
+    }
+    else{
+        return PRINTEMPS;
+    }
+}
+
+
+// Pas de test effectuer 
+ListeInsectes cycledeMort(ListeInsectes listeInsectes){
+    if(is_empty_list(listeInsectes)){
+        return new_list();
+    }
+    else{
+        while(listeInsectes != NULL){
+            if(listeInsectes->type == TYPE_REINE){
+                if(listeInsectes->age >= DUREE_VIE_MAX_REINE_J){
+                    listeInsectes = pop_front_list(listeInsectes);
+                }
+            }
+            if(listeInsectes->type == TYPE_OUVRIERE){
+                if(listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J){
+                    listeInsectes = pop_front_list(listeInsectes);
+                }
+            }
+            if(listeInsectes->type == TYPE_FAUX_BOURDON){
+                if(listeInsectes->age >= DUREE_VIE_MAX_FAUX_BOURDON_J){
+                    listeInsectes = pop_front_list(listeInsectes);
+                }
+            }
+            listeInsectes = listeInsectes->next ;
+        }
+        return listeInsectes;
+    }
+}
+
+// A TESTER !!!!!!!!!!!!!!!!!!!!!!!! et a finir
+ListeInsectes cycledeFaim(ListeInsectes listeInsectes, Ruche ruche){
+    if(is_empty_list(listeInsectes)){
+        return new_list();
+    }
+    else{
+        while(listeInsectes != NULL){
+            if(ruche.reserveMiel <= 0 || ruche.reserveEau <= 0 || ruche.reservePollen <= 0){
+                listeInsectes->faim = true;
+                ruche.reserveMiel -= 1;
+                ruche.reserveEau -= 1;
+                ruche.reservePollen -= 1;
+            }
+            else{
+                listeInsectes->faim = false;
+
+            }
+            listeInsectes = listeInsectes->next ;
+        }
+        return listeInsectes;
+    }
+}
+
+
+ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, Saisons saison, Ruche ruche){
+    if(is_empty_list(listeInsectes)){
+        return new_list();
+    }
+    else{
+        while(listeInsectes != NULL){
+            if(listeInsectes->type == TYPE_REINE){
+                if(saison == PRINTEMPS || saison == ETE){
+                    listeInsectes->data.reine.ponteJournaliere = true;    
+                    GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, LARVE, 0, SANTE_MAX, false);
+
+                }
+                listeInsectes->age += 1;
+                
+                // if(listeInsectes->data.reine.emmet_feromones){
+                //     //emission de feromones
+                // }
+            }
+            if(listeInsectes->type == TYPE_OUVRIERE){
+                switch(listeInsectes->data.ouvriere.role){
+                    case LARVE:
+                        //tavail nettoyeuse
+                        break;
+                    case NETTOYEUSE:
+                        //tavail nourrice
+                        break;
+                    case NOURRICE:
+                        //tavail magasiniere
+                        break;
+                    case MAGASINIERE:
+                        //tavail cireuse
+                        break;
+                    case CIRIERE:
+                        //tavail ventileuse
+                        break;
+                    case VENTILEUSE:
+                        //tavail gardienne
+                        break;
+                    case GARDIENNE:
+                        //tavail butineuse
+                        break;
+                    case BUTINEUSE:
+                        //tavail butineuse
+                        break;
+                }
+            }
+            if(listeInsectes->type == TYPE_FAUX_BOURDON){
+                // if(listeInsectes->data.FauxBourdon.feromones){
+                //     //emission de feromones
+                // }
+                if(listeInsectes->data.FauxBourdon.enQueteReine){
+                    //en quete de reine
+                }
+            }
+            listeInsectes = listeInsectes->next ;
+            
+       
         }
         return listeInsectes;
     }
