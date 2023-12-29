@@ -1,7 +1,6 @@
 #include "SDL.h"
 
 
-
 /*
     SDL_RENDERER_SOFTWARE (procésseur)
     SDL_RENDERER_ACCELERATED (accelaration materielle carte graphique)
@@ -10,8 +9,11 @@
 
 */
 
-
-void SDL_ExitWithError(const char *message);
+void SDL_ExitWithError(const char *message){
+    SDL_Log("ERREUR : %s > %s\n", message, SDL_GetError());
+    SDL_Quit();
+    exit(EXIT_FAILURE);
+}
 
 int main(int argc, char **argv){
     SDL_version nb ;
@@ -19,7 +21,7 @@ int main(int argc, char **argv){
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
 
-    printf("SDL %d.%d.%d !\n", nb.major, nb.minor, nb.patch);
+    printf("Game's Loading...\n");
 
 
     if(SDL_Init(SDL_INIT_VIDEO) != 0){
@@ -45,19 +47,19 @@ int main(int argc, char **argv){
     }
 
 
-    if(SDL_RenderDrawPoint(renderer, 100, 450) != 0){
-        SDL_ExitWithError("Impossible de dessiner un point");
+/*    if(SDL_RenderDrawPoint(renderer, 100, 450) != 0){
+        SDL_ExitWithError("Impossible de dessiner un point");           Ne sert à Rien
     }
-
+*/
     if(SDL_RenderDrawLine(renderer, 50, 50, 500, 500) != 0){
         SDL_ExitWithError("Impossible de dessiner une ligne");
     }
 
     SDL_Rect rectangle ;
     rectangle.x = 400;
-    rectangle.y = 300;
-    rectangle.w = 200;
-    rectangle.h = 100;
+    rectangle.y = 500;
+    rectangle.w = 300;
+    rectangle.h = 200;
 
 
     if(SDL_RenderDrawRect(renderer, &rectangle) != 0){
@@ -65,21 +67,31 @@ int main(int argc, char **argv){
     }
 
     SDL_RenderPresent(renderer);
-    SDL_Delay(3000);
+    //SDL_Delay(3000);
 
     if(SDL_RenderClear(renderer) != 0){
         SDL_ExitWithError("Effacement rendu echouee");
     }
- 
-    SDL_DestroyWindow(window);
+
+    bool Quitter = false;                   // Maintient de la fenetre jusqu'à ce que l'utilisateur la ferme
+    while (!Quitter)
+    {
+        SDL_Event action_utilisateur;
+        while (SDL_PollEvent(&action_utilisateur))
+        {
+            switch (action_utilisateur.type)
+            {
+                case SDL_QUIT:
+                    Quitter = true;
+                break;
+            }
+        }
+        
+    }
+    
+ /*   SDL_DestroyWindow(window);
     SDL_Quit() ;
-    return EXIT_SUCCESS;
+    return EXIT_SUCCESS;*/
 }
 
 // gcc main.c -o prog $(sdl2-config --cflags --libs)
-
-void SDL_ExitWithError(const char *message){
-    SDL_Log("ERREUR : %s > %s\n", message, SDL_GetError());
-    SDL_Quit();
-    exit(EXIT_FAILURE);
-}
