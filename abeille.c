@@ -59,8 +59,6 @@ typedef enum Saisons {
     AUTOMNE,
     HIVER
 } Saisons;
-
-
 typedef struct Ruche {
     float temperature;
     float humidite;
@@ -259,7 +257,7 @@ LARVE 20%, NETTOYEUSE 5%, NOURRICE 15, MAGASINIERE 10%, CIRIERE 10%, VENTILEUSE 
 
 ListeInsectes initialisationEssaim(ListeInsectes listeInsectes, unsigned int nbOuvrieres) {
     unsigned int i;
-    unsigned int nbLarves = (nbOuvrieres * 20) / 100; // 20%
+    unsigned int nbLarves = (nbOuvrieres * 20) / 100; // 20%    
     unsigned int nbNettoyeuses = (nbOuvrieres * 5) / 100; // 5%
     unsigned int nbNourrices = (nbOuvrieres * 15) / 100; // 15%
     unsigned int nbMagasinieres = (nbOuvrieres * 10) / 100; // 10%
@@ -338,6 +336,8 @@ ListeInsectes clear_list(ListeInsectes listeInsectes){
         return listeInsectes;
     }
 }
+
+//void naissance ()
 
 // ON PROGRESS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
