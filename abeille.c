@@ -80,8 +80,16 @@ typedef struct Ruche {
     
 } Ruche;
 
-typedef enum RoleOuvriere {
+typedef	enum cycleCroissance{
+    OEUF,
     LARVE,
+    PUPAISON,
+    ADULTE
+} cycleCroissance ;
+typedef enum RoleOuvriere {
+    OEUF,
+    LARVE,
+    PUPAISON,
     NETTOYEUSE,
     NOURRICE,
     MAGASINIERE,
@@ -343,7 +351,7 @@ ListeInsectes clear_list(ListeInsectes listeInsectes){
 
 
 /*
-- Cycle de vie : naissance mort 
+- Cycle de vie : naissance croissance mort 
 - Cycle des saisons : Printemps Ete Automne Hiver
 - Activité journaliere de reine: 
     - ponte larves
@@ -356,6 +364,30 @@ ListeInsectes clear_list(ListeInsectes listeInsectes){
 - Prédateurs/ Nuisibles
 - Maladies 
 */
+
+
+
+ListeInsectes cycleCroissance(ListeInsectes listeInsectes){
+    if(listeInsectes->type == TYPE_OUVRIERE){
+        if(listeInsectes->age >= TEMPS_OEUF_OUVRIERE_J){
+            listeInsectes->data.ouvriere.role = LARVE;
+        }
+        if(listeInsectes->age >= TEMPS_LARVE_OUVRIERE_J){
+            listeInsectes->data.ouvriere.role = PUPAISON;
+        }
+        if(listeInsectes->age >= TEMPS_PUPAISON_OUVRIERE_J){
+            listeInsectes->data.ouvriere.role = NETTOYEUSE;
+        }
+    }
+    if(listeInsectes->type == TYPE_FAUX_BOURDON){
+        if(listeInsectes->age >= TEMPS_OEUF_FAUX_BOURDON_J){
+            listeInsectes.
+        } 
+        if
+    }
+
+    return listeInsectes
+}
 
 ListeInsectes cyclePondaisonReine(ListeInsectes listeInsectes, Saisons saison){
     if(is_empty_list(listeInsectes)){
@@ -399,19 +431,23 @@ Saisons cycleSaison(unsigned int jourNumero){
 
 
 // Pas de test effectuer 
-ListeInsectes cycledeMort(ListeInsectes listeInsectes){
+ListeInsectes cycledeMort(ListeInsectes listeInsectes, Saisons saisons){
     if(is_empty_list(listeInsectes)){
         return new_list();
     }
     else{
         while(listeInsectes != NULL){
+            // if(listeInsectes->faim==true){
+            //     listeInsectes->sante -= 25; //sachant 100 pts de vie, donner une valeur arbitraire pour determiner le nombre de jour de famine acceptable/ capacité abeille ? 
+            // }
             if(listeInsectes->type == TYPE_REINE){
                 if(listeInsectes->age >= DUREE_VIE_MAX_REINE_J){
                     listeInsectes = pop_front_list(listeInsectes);
                 }
             }
             if(listeInsectes->type == TYPE_OUVRIERE){
-                if(listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J){
+                if((listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J && (saisons == ETE || saisons == PRINTEMPS)) 
+                    || listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_HIVER_J && (saisons == HIVER || saisons == AUTOMNE)){
                     listeInsectes = pop_front_list(listeInsectes);
                 }
             }
@@ -433,14 +469,27 @@ ListeInsectes cycledeFaim(ListeInsectes listeInsectes, Ruche ruche){
     }
     else{
         while(listeInsectes != NULL){
-            if(ruche.reserveMiel <= 0 || ruche.reserveEau <= 0 || ruche.reservePollen <= 0){
-                listeInsectes->faim = true;
+            if(ruche.reserveMiel >= 0 && ruche.reserveEau >= 0 && listeInsectes->type == TYPE_OUVRIERE){
+                listeInsectes->faim = false;
                 ruche.reserveMiel -= 1;
                 ruche.reserveEau -= 1;
-                ruche.reservePollen -= 1;
+            }
+            else if(ruche.reserveMiel >= 0 && ruche.reserveEau >= 0 && listeInsectes->type == TYPE_FAUX_BOURDON){
+                listeInsectes->faim = false;
+                ruche.reserveMiel -= 1;
+                ruche.reserveEau -= 1;
+            }
+            else if(ruche.reserveGeleeRoyale >= 0 && ruche.reserveGeleeRoyale >= 0 && listeInsectes->type == TYPE_REINE){
+                listeInsectes->faim = false;
+                ruche.reserveGeleeRoyale -= 1;
+                ruche.reserveEau -= 1;
+            }  
+            else if(listeInsectes->type == TYPE_OURSE || listeInsectes->type == TYPE_GUEPE){
+                //implementer nourriture ou non des ourse/guepe ? rand nourriture trouver => agressivité  => rand ruche trouvé => attaque ruche
             }
             else{
-                listeInsectes->faim = false;
+                listeInsectes->faim = true;
+                listeInsectes->sante -= 25;
 
             }
             listeInsectes = listeInsectes->next ;
@@ -459,7 +508,7 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, Saisons saison, Ruch
             if(listeInsectes->type == TYPE_REINE){
                 if(saison == PRINTEMPS || saison == ETE){
                     listeInsectes->data.reine.ponteJournaliere = true;    
-                    GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, LARVE, 0, SANTE_MAX, false);
+                    GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, OEUF, 0, SANTE_MAX, false);
 
                 }
                 listeInsectes->age += 1;
