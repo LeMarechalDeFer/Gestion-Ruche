@@ -11,7 +11,7 @@
 #define NOMBRE_ABEILLES_MAX 60000
 #define PONTE_MAX_JOUR 2000
 
-#define TEMPS_INCUBATION_REINE_J 3
+#define TEMPS_OEUF_REINE_J 3
 #define TEMPS_LARVE_REINE_J 6
 #define TEMPS_PUPAISON_REINE_J 7
 //sort de sa cellule à 16 jours
@@ -80,7 +80,7 @@ typedef struct Ruche {
     
 } Ruche;
 
-typedef	enum cycleCroissance{
+typedef	enum CycleCroissanceAbeilles{
     OEUF,
     LARVE,
     PUPAISON,
@@ -140,6 +140,7 @@ typedef struct Insecte {
     unsigned int age; 
     bool faim;
     TypeInsecte type; 
+    //CycleCroissanceAbeilles cycle;
     union {
         Reine reine;
         Ouvriere ouvriere;
@@ -366,7 +367,7 @@ ListeInsectes clear_list(ListeInsectes listeInsectes){
 */
 
 
-
+//changer avec l'enum cycledevie
 ListeInsectes cycleCroissance(ListeInsectes listeInsectes){
     if(listeInsectes->type == TYPE_OUVRIERE){
         if(listeInsectes->age >= TEMPS_OEUF_OUVRIERE_J){
@@ -381,12 +382,28 @@ ListeInsectes cycleCroissance(ListeInsectes listeInsectes){
     }
     if(listeInsectes->type == TYPE_FAUX_BOURDON){
         if(listeInsectes->age >= TEMPS_OEUF_FAUX_BOURDON_J){
-            listeInsectes.
+            //Larve
         } 
-        if
+        if(listeInsectes->age >= TEMPS_LARVE_FAUX_BOURDON_J){
+            //pupaison
+        }
+        if(listeInsectes->age >= TEMPS_PUPAISON_FAUX_BOURDON_J){
+            //adulte
+        }
+    }
+    if(listeInsectes->type == TYPE_REINE){
+        if(listeInsectes->age >= TEMPS_OEUF_REINE_J){
+            //Larve
+        } 
+        if(listeInsectes->age >= TEMPS_LARVE_REINE_J){
+            //pupaison
+        }
+        if(listeInsectes->age >= TEMPS_PUPAISON_REINE_J){
+            //adulte
+        }
     }
 
-    return listeInsectes
+    return listeInsectes;
 }
 
 ListeInsectes cyclePondaisonReine(ListeInsectes listeInsectes, Saisons saison){

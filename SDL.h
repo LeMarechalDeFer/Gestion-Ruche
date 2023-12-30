@@ -8,6 +8,6 @@
 #include <string.h>
 
 
-
+void SDL_ExitWithError(const char *message);
 
 #endif
