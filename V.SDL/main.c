@@ -5,17 +5,21 @@
     SDL_RENDERER_TARGETTEXTURE (rendu selon texture)
 
 */
-
 #include "SDL.h"
+
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
+SDL_Surface* image = NULL;
+SDL_Texture* texture = NULL;
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
+#define IMG_PATH "BackGround.bmp"
 
 #define TAILLE_ABEILLE 100
 #define BEES 100
 
+void SDL_ExitWithError(const char *message);
 typedef struct Ruche {
     float W;    // Largeur
     float X;    // Postion X
@@ -62,14 +66,47 @@ void render_Abeille(Abeille *abeille)
     SDL_SetRenderDrawColor(renderer,255,255,255,255);
     SDL_RenderFillRect(renderer,&abeille_rect);
     SDL_RenderPresent(renderer);
-
 }
 
 void update(float Temp_écoulé)
 {
     SDL_SetRenderDrawColor(renderer,0,0,0,255);
     SDL_RenderClear(renderer);
-    render_Abeille(&abeille);
+    //render_Abeille(&abeille);
+
+    image = SDL_LoadBMP("BackGroundd.bmp");
+    if(image == NULL)
+    {
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_ExitWithError("Failed to load image");
+    }
+
+    texture = SDL_CreateTextureFromSurface(renderer, image);
+    SDL_FreeSurface(image);
+
+    if(image == NULL)
+    {
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_ExitWithError("Failed to create texture");
+    }
+    SDL_Rect rectangle;
+    if (SDL_QueryTexture(texture, NULL,NULL,&rectangle.w, &rectangle.h)!= 0)
+    {
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_ExitWithError("Failed to load texture");
+    }
+    rectangle.x = (WINDOW_WIDTH - rectangle.w)/2;
+    rectangle.y = (WINDOW_HEIGHT - rectangle.h)/2;
+
+    if(SDL_RenderCopy(renderer,texture,NULL,&rectangle))
+    {
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_ExitWithError("Failed to render Copy");
+    }
     SDL_RenderPresent(renderer);
 }
 
@@ -91,26 +128,25 @@ SDL_Window* initSDL()
     return window;
 }
 
-void SDL_ExitWithError(const char *message){
-    SDL_Log("ERREUR : %s > %s\n", message, SDL_GetError());
-    SDL_Quit();
-    exit(EXIT_FAILURE);
-}
-
 int main(int argc, char **argv){
 
     SDL_Window* window = initSDL();
+
     
     if (!window) {
         return 1;
     }
+
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     printf("Game's Loading...\n");
-
+    
     Uint32 Dernier_Tick = SDL_GetTicks();                    // Chronomètre qui commence dès que le SDL init est en route
+
     bool Quitter = false;                   
+
     SDL_Event action_utilisateur;
+
     while (!Quitter)
     {
         while (SDL_PollEvent(&action_utilisateur))
@@ -131,13 +167,19 @@ int main(int argc, char **argv){
             update(Temp_écoulé);
             Dernier_Tick = Tick_Actuel;
         }
-        
     }
     
     SDL_DestroyWindow(window);
     SDL_Quit() ;
     return EXIT_SUCCESS;
 }
+
+void SDL_ExitWithError(const char *message){
+    SDL_Log("ERREUR : %s > %s\n", message, SDL_GetError());
+    SDL_Quit();
+    exit(EXIT_FAILURE);
+}
+
 /*void shutdown(void) {
     if(renderer){
         SDL_DestroyRenderer(renderer);
@@ -148,4 +190,4 @@ int main(int argc, char **argv){
     SDL_Quit();
 }*/
 
-// gcc main.c -o prog $(sdl2-config --cflags --libs)
+// gcc main.c -o SDL $(sdl2-config --cflags --libs)
