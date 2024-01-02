@@ -6,7 +6,7 @@
 
 */
 #include "Config/SDL.h"
-#include "Config/Display.h"
+#include "Config/Constantes.h"
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
