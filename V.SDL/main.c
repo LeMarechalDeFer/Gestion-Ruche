@@ -10,10 +10,21 @@
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
+
 SDL_Surface* image_background = NULL;
-SDL_Surface* image_Ruche = NULL;
 SDL_Texture* texture_background = NULL;
+
+SDL_Surface* image_Ruche = NULL;
 SDL_Texture* texture_ruche = NULL;
+
+SDL_Texture *Abeille_SPRITE = NULL;
+
+SDL_Surface* surface_Timer = NULL;
+SDL_Texture* texture_Timer = NULL;
+
+int spriteX = 0;
+int spriteY = 0;
+int currentAnimationFrame = 0;
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -31,6 +42,20 @@ typedef struct Ruche {
 
 //Ruche ruches[BEES];
 
+void loadSprite(const char *spritePath) {
+    SDL_Surface *spriteSurface = SDL_LoadBMP(spritePath);
+    Abeille_SPRITE = SDL_CreateTextureFromSurface(renderer, spriteSurface);
+    SDL_FreeSurface(spriteSurface);
+}
+
+void render_Sprite() {
+    SDL_RenderClear(renderer);
+    
+    SDL_Rect spriteRect = {currentAnimationFrame * 100, 0, 100, 100}; // Change the size as needed
+    SDL_RenderCopy(renderer, Abeille_SPRITE, &spriteRect, &spriteRect);
+
+    SDL_RenderPresent(renderer);
+}
 
 
 void MAKE_ABEILLE(float Temp_écoulé)
@@ -40,7 +65,7 @@ void MAKE_ABEILLE(float Temp_écoulé)
     for(int i = 0; i<NB_BEES; i++)
     {
 
-        SDL_Surface *BEE_surface = SDL_LoadBMP(BEES_IMAGE);
+        SDL_Surface *BEE_surface = SDL_LoadBMP(BEES_IMAGE_Position_4);
         if(BEE_surface == NULL)
         {
             SDL_DestroyRenderer(renderer);
@@ -119,12 +144,26 @@ void MAKE_ABEILLE(float Temp_écoulé)
 */
 void Display(float Temp_écoulé)
 {
+    TTF_Font* font = TTF_OpenFont("Config/Roboto-BlackItalic.ttf", 24);
     SDL_SetRenderDrawColor(renderer,0,0,0,255);
     SDL_RenderClear(renderer);
 
+    if (!font) {
+        printf("Failed to load font: %s\n", TTF_GetError());
+        exit (-1);
+    }
+
+    SDL_Color color = {255, 255, 255, 255}; // White color for the font
+    SDL_RenderClear(renderer);
+    char timeText[1000];
+
+    sprintf(timeText, "Time: %f seconds", Temp_écoulé);
+
     SDL_Surface *surface_background = SDL_LoadBMP(BACKGROUND_IMAGE);
     SDL_Surface *Ruche_surface = SDL_LoadBMP(HIVE_IMAGE);
-    SDL_Surface *BEE_surface = SDL_LoadBMP(BEES_IMAGE);
+    SDL_Surface *BEE_surface1 = SDL_LoadBMP(BEES_IMAGE_Position_1);
+    SDL_Surface* surface_Timer = TTF_RenderText_Solid(font, timeText, color);
+
     if(surface_background == NULL)
     {
         SDL_DestroyRenderer(renderer);
@@ -134,10 +173,15 @@ void Display(float Temp_écoulé)
 
     SDL_Texture *texture_background = SDL_CreateTextureFromSurface(renderer, surface_background);
     SDL_Texture *Ruche_texture = SDL_CreateTextureFromSurface(renderer, Ruche_surface);
-    SDL_Texture *BEE_texture = SDL_CreateTextureFromSurface(renderer, BEE_surface);
+    SDL_Texture *BEE_texture1 = SDL_CreateTextureFromSurface(renderer, BEE_surface1);
+    SDL_Texture* texture_Timer = SDL_CreateTextureFromSurface(renderer, surface_Timer);
+
+
     SDL_FreeSurface(surface_background);
     SDL_FreeSurface(Ruche_surface);
-    SDL_FreeSurface(BEE_surface);
+    SDL_FreeSurface(BEE_surface1);
+    SDL_FreeSurface(surface_Timer);
+
 
     if(texture_background == NULL)
     {
@@ -165,16 +209,16 @@ void Display(float Temp_écoulé)
     ruche_position.x = 20;
     ruche_position.y = 240;
     SDL_Rect BEE_position;
-        if (SDL_QueryTexture(BEE_texture, NULL,NULL,&BEE_position.w, &BEE_position.h)!= 0)
+        if (SDL_QueryTexture(BEE_texture1, NULL,NULL,&BEE_position.w, &BEE_position.h)!= 0)
         {
             SDL_DestroyRenderer(renderer);
             SDL_DestroyWindow(window);
-            SDL_ExitWithError("Failed to load BEE texture");
+            SDL_ExitWithError("Failed to load BEE texture1");
         }
-
         BEE_position.x = 25;
-        BEE_position.x = BEE_position.x + 5;
         BEE_position.y = 20;
+
+    SDL_Rect timer_position = { 400, 0, 200, 50 };
     
 
 
@@ -192,12 +236,19 @@ void Display(float Temp_écoulé)
         SDL_ExitWithError("Failed to render Copy the Hive");
     }
 
-    if(SDL_RenderCopy(renderer,BEE_texture,NULL,&BEE_position))
+    if(SDL_RenderCopy(renderer,BEE_texture1,NULL,&BEE_position))
     {
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
-        SDL_ExitWithError("Failed to render Copy the BEE");
+        SDL_ExitWithError("Failed to render Copy the BEE 1");
     }
+    if(SDL_RenderCopy(renderer, texture_Timer, NULL, &timer_position))
+    {
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_ExitWithError("Failed to render Copy the Timer");
+    }
+
     SDL_RenderPresent(renderer);
     SDL_RenderClear(renderer);
 }
@@ -220,21 +271,45 @@ SDL_Window* initSDL()
     return window;
 }
 
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+// Initialize SDL and TTF
+void init_TTF() {
+    SDL_Init(SDL_INIT_TIMER);
+    TTF_Init();
+}
+
+// Clean up SDL and TTF
+void quit(SDL_Window* window, SDL_Renderer* renderer, TTF_Font* font) {
+    TTF_CloseFont(font);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    TTF_Quit();
+    SDL_Quit();
+}
+
 int main(int argc, char **argv){
-
+    init_TTF();
     SDL_Window* window = initSDL();
-
+    Uint32 Start_tick = SDL_GetTicks();                    // Chronomètre qui commence dès que le SDL init est en route
+    TTF_Font* font = TTF_OpenFont("Config/Roboto-BlackItalic.ttf", 24); // mettre le bon nom du fichier
     
     if (!window) {
         return 1;
     }
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
+    
     printf("Game's Loading...\n");
     
-    Uint32 Dernier_Tick = SDL_GetTicks();                    // Chronomètre qui commence dès que le SDL init est en route
     SDL_bool program_launched = SDL_TRUE;              
 
+    loadSprite("Assets/Position_1.bmp");
 
     while (program_launched)
     {
@@ -255,25 +330,29 @@ int main(int argc, char **argv){
                     else
                         continue;
             }
-            Uint32 Tick_Actuel = SDL_GetTicks()/1000;
-            Uint32 Differentiel_ticks = Tick_Actuel - Dernier_Tick;
-            float Temp_écoulé = Differentiel_ticks; // Seconde ;)
+            Uint32 Differentiel_ticks = SDL_GetTicks() - Start_tick;
+            float Temp_écoulé = Differentiel_ticks/1000.0f; // Seconde ;)
+            printf("%f \n",Temp_écoulé);
             Display(Temp_écoulé);
            // Make_Ruche();
-            Dernier_Tick = Tick_Actuel;
         }
     }
     
     SDL_DestroyWindow(window);
-    SDL_Quit() ;
+    quit(window, renderer,font);
     return EXIT_SUCCESS;
 }
 
 void SDL_ExitWithError(const char *message){
     SDL_Log("ERREUR : %s > %s\n", message, SDL_GetError());
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    TTF_Quit();
     SDL_Quit();
     exit(EXIT_FAILURE);
 }
+
+
 
 /*void shutdown(void) {
     if(renderer){
@@ -285,4 +364,5 @@ void SDL_ExitWithError(const char *message){
     SDL_Quit();
 }*/
 
-// gcc main.c -o SDL $(sdl2-config --cflags --libs)
+// gcc main.c -o SDL $(sdl2-config --cflags --libs)-
+//gcc main.c -o SDL $(sdl2-config --cflags --libs) -lSDL2_ttf
