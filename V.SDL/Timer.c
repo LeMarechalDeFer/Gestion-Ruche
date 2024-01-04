@@ -16,25 +16,19 @@ void quit(SDL_Window* window, SDL_Renderer* renderer, TTF_Font* font) {
     TTF_Quit();
     SDL_Quit();
 }
-
-// Main function to create a timer and display it
-int main(int argc, char* args[]) {
-    init();
-
-    SDL_Window* window = SDL_CreateWindow("Timer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, 0);
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
+void timer(SDL_Window* window,SDL_Renderer* renderer, TTF_Font* font)
+{
     // Load a font
-    TTF_Font* font = TTF_OpenFont("Roboto-BlackItalic.ttf", 24); // Make sure to provide the correct path to your font file
+   
     if (!font) {
         printf("Failed to load font: %s\n", TTF_GetError());
         quit(window, renderer, font);
         return -1;
     }
 
-    SDL_Color color = {255, 255, 255, 255}; // White color for the font
+    SDL_Color color = {25, 50, 255, 255}; // White color for the font
     Uint32 start = SDL_GetTicks();
-    char timeText[100];
+    char timeText[1000];
 
     // Event loop flag
     int running = 1;
@@ -63,7 +57,7 @@ int main(int argc, char* args[]) {
         int text_height = surface->h;
 
         // Define where on the window we want to render the text
-        SDL_Rect renderQuad = { 10, 10, text_width, text_height };
+        SDL_Rect renderQuad = { 100, 100, text_width, text_height };
 
         // Render the text
         SDL_RenderCopy(renderer, texture, NULL, &renderQuad);
@@ -78,6 +72,16 @@ int main(int argc, char* args[]) {
         SDL_Delay(1000); // Update every second
     }
 
+}
+// Main function to create a timer and display it
+int main(int argc, char* args[]) {
+    init();
+
+    SDL_Window* window = SDL_CreateWindow("Timer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, 0);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    TTF_Font* font = TTF_OpenFont("Roboto-BlackItalic.ttf", 50); // Make sure to provide the correct path to your font file
+    timer(window,renderer,font);
+    
     quit(window, renderer, font);
     return 0;
 }

@@ -1,5 +1,3 @@
-#ifndef __SDL_H__
-#define __SDL_H__
 
 #include <SDL2/SDL.h>
 #include <stdio.h>
@@ -8,5 +6,5 @@
 #include <string.h>
 
 
+//#include "SDL2/SDL_image.h"
 
-#endif
