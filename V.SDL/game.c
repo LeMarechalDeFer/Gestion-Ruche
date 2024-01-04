@@ -15,15 +15,14 @@ ge -lSDL2_ttf */
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 
-
-SDL_Surface* image_background = NULL;
+SDL_Surface* surface_background = NULL;
 SDL_Texture* texture_background = NULL;
 
 SDL_Surface* image_Ruche = NULL;
 SDL_Texture* texture_ruche = NULL;
 
 SDL_Surface *BEE_surface = NULL;
-SDL_Texture *BEE_texture[4];
+SDL_Texture *BEE_texture = NULL;
 
 SDL_Surface* surface_Timer = NULL;
 SDL_Texture* texture_Timer = NULL;
@@ -43,28 +42,35 @@ typedef struct Ruche {
     float Z;    // Hauteur
 } Ruche;
 
+typedef struct{
+    const char* seasonName;
+    const char* backgroundImagePath;
+}Saison;
+
+Saison seasons[] = {
+    {"Spring", "path/to/spring_background.bmp"},
+    {"Summer", "path/to/summer_background.bmp"},
+    {"Autumn", "path/to/autumn_background.bmp"},
+    {"Winter", "Assets/Winter_Background.bmp"}
+};
 //Ruche ruches[BEES];
 void load_bee_texture()
 {
-        for (int i = 1; i <= 4; ++i) {
-        char filePath[50];
-        snprintf(filePath, sizeof(filePath), "Assets/Position_%d.bmp", i);
-
-        SDL_Surface* BEE_surface = SDL_LoadBMP(filePath);
+        SDL_Surface* BEE_surface = SDL_LoadBMP("Assets/Position_1.bmp");
         if (!BEE_surface) {
-            printf("Failed to load bee frame %d! SDL Error: %s\n", i, SDL_GetError());
+            printf("Failed to load bee frame! SDL Error: %s\n", SDL_GetError());
             exit(EXIT_FAILURE);
         }
 
-        BEE_texture[i] = SDL_CreateTextureFromSurface(renderer, BEE_surface);
+        BEE_texture = SDL_CreateTextureFromSurface(renderer, BEE_surface);
 
-        if (!BEE_texture[i]) {
-            printf("Failed to create texture for bee frame %d! SDL Error: %s\n", i, SDL_GetError());
+        if (!BEE_texture) {
+            printf("Failed to create texture for bee frame! SDL Error: %s\n", SDL_GetError());
             exit(EXIT_FAILURE);
         }
         SDL_FreeSurface(BEE_surface);
-    }
 }
+
 void Display(float Temp_écoulé)
 {
     TTF_Font* font = TTF_OpenFont("Config/Roboto-BlackItalic.ttf", 24);
@@ -84,7 +90,7 @@ void Display(float Temp_écoulé)
 
     sprintf(timeText, "Time: %f seconds", Temp_écoulé);
 
-    SDL_Surface *surface_background = SDL_LoadBMP(BACKGROUND_IMAGE);
+    SDL_Surface *surface_background = SDL_LoadBMP("Assets/BackGroundd.bmp");
     SDL_Surface *Ruche_surface = SDL_LoadBMP(HIVE_IMAGE);
     SDL_Surface* surface_Timer = TTF_RenderText_Solid(font, timeText, color);
 
@@ -92,13 +98,12 @@ void Display(float Temp_écoulé)
     {
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
-        SDL_ExitWithError("Failed to load image");
+        SDL_ExitWithError("Failed to load Backround image");
     }
 
     SDL_Texture *texture_background = SDL_CreateTextureFromSurface(renderer, surface_background);
     SDL_Texture *Ruche_texture = SDL_CreateTextureFromSurface(renderer, Ruche_surface);
     SDL_Texture *texture_Timer = SDL_CreateTextureFromSurface(renderer, surface_Timer);
-
 
     SDL_FreeSurface(surface_background);
     SDL_FreeSurface(Ruche_surface);
@@ -154,17 +159,13 @@ void Display(float Temp_écoulé)
         SDL_ExitWithError("Failed to render Copy the Timer");
     }
     SDL_Rect BEE_rect = { 100, 100, 50, 50 };
-    for(int i = 1; i<= 4;i++)
+    if (SDL_RenderCopy(renderer,BEE_texture,NULL,&BEE_rect))
     {
-        if(SDL_RenderCopy(renderer,BEE_texture[i],NULL,&BEE_rect))
-        {
-            SDL_DestroyRenderer(renderer);
-            SDL_DestroyWindow(window);
-            SDL_ExitWithError("Failed to render Copy the BEE");
-        }
-        SDL_RenderPresent(renderer);
-        SDL_Delay(200);
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window); 
+        SDL_ExitWithError("Failed to render copy the BEE !");
     }
+    SDL_RenderPresent(renderer);
     SDL_RenderClear(renderer);
 }
 
@@ -223,5 +224,19 @@ void SDL_ExitWithError(const char *message){
     SDL_Quit();
 }*/
 
+
+ /*                         Pour l'animation de l'abeille (pas opti vu que ça lag sa mère)
+for(int i = 1; i<= 4;i++)
+    {
+        if(SDL_RenderCopy(renderer,BEE_texture[i],NULL,&BEE_rect))
+        {
+            SDL_DestroyRenderer(renderer);
+            SDL_DestroyWindow(window);
+            SDL_ExitWithError("Failed to render Copy the BEE");
+        }
+        SDL_RenderPresent(renderer);
+        SDL_Delay(200);
+    }
+*/
 // gcc main.c -o SDL $(sdl2-config --cflags --libs)-
 //gcc main.c -o SDL $(sdl2-config --cflags --libs) -lSDL2_ttf
