@@ -1,243 +1,44 @@
-/*
-    SDL_RENDERER_SOFTWARE (procésseur)
-    SDL_RENDERER_ACCELERATED (accelaration materielle carte graphique)
-    SDL_RENDERER_PRESENTVSYNC (synchronisation verticale)
-    SDL_RENDERER_TARGETTEXTURE (rendu selon texture)
-
-*/
-#include "Config/SDL.h"
-#include "Config/Constantes.h"
-
-SDL_Window* window = NULL;
-SDL_Renderer* renderer = NULL;
-SDL_Surface* image_background = NULL;
-SDL_Surface* image_Ruche = NULL;
-SDL_Texture* texture_background = NULL;
-SDL_Texture* texture_ruche = NULL;
-
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
-
-#define TAILLE_ABEILLE 100
-#define NB_BEES 10
-
-void SDL_ExitWithError(const char *message);
-typedef struct Ruche {
-    float W;    // Largeur
-    float X;    // Postion X
-    float Y;    // Position Y
-    float Z;    // Hauteur
-} Ruche;
-
-//Ruche ruches[BEES];
+#include "game.c"
 
 
-
-void MAKE_ABEILLE(float Temp_écoulé)
-{ 
-    SDL_SetRenderDrawColor(renderer,0,0,0,255);
-    SDL_RenderClear(renderer);
-    for(int i = 0; i<NB_BEES; i++)
-    {
-
-        SDL_Surface *BEE_surface = SDL_LoadBMP(BEES_IMAGE);
-        if(BEE_surface == NULL)
-        {
-            SDL_DestroyRenderer(renderer);
-            SDL_DestroyWindow(window);
-            SDL_ExitWithError("Failed to load Bee image");
-        }
-        SDL_Texture *BEE_texture = SDL_CreateTextureFromSurface(renderer, BEE_surface);
-        SDL_FreeSurface(BEE_surface);
-        if(BEE_texture == NULL)
-        {
-            SDL_DestroyRenderer(renderer);
-            SDL_DestroyWindow(window);
-            SDL_ExitWithError("Failed to create BEE texture");
-        }
-        SDL_Rect BEE_position;
-        if (SDL_QueryTexture(BEE_texture, NULL,NULL,&BEE_position.w, &BEE_position.h)!= 0)
-        {
-            SDL_DestroyRenderer(renderer);
-            SDL_DestroyWindow(window);
-            SDL_ExitWithError("Failed to load BEE texture");
-        }
-        BEE_position.x = 25;
-        BEE_position.x = BEE_position.x + 5;
-        BEE_position.y = 20;
-
-        if(SDL_RenderCopy(renderer,BEE_texture,NULL,&BEE_position))
-        {
-            SDL_DestroyRenderer(renderer);
-            SDL_DestroyWindow(window);
-            SDL_ExitWithError("Failed to render Copy the BEE");
-        }
-        SDL_RenderPresent(renderer);
-        SDL_RenderClear(renderer);
-    }
-}
-/*void Make_Ruche()
+int main(int argc, char **argv)
 {
-    SDL_SetRenderDrawColor(renderer,0,0,0,255);
-    SDL_RenderClear(renderer);
-
-    SDL_Surface *Ruche_surface = SDL_LoadBMP(HIVE_IMAGE);
-    if(Ruche_surface == NULL)
-    {
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_ExitWithError("Failed to load Hive image");
-    }
-    SDL_Texture *Ruche_texture = SDL_CreateTextureFromSurface(renderer, Ruche_surface);
-    SDL_FreeSurface(Ruche_surface);
-    if(Ruche_texture == NULL)
-    {
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_ExitWithError("Failed to create Hive texture");
-    }
-    SDL_Rect ruche_position;
-    if (SDL_QueryTexture(Ruche_texture, NULL,NULL,&ruche_position.w, &ruche_position.h)!= 0)
-    {
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_ExitWithError("Failed to load Hive texture");
-    }
-    ruche_position.x = 20;
-    ruche_position.y = 20;
-
-    if(SDL_RenderCopy(renderer,Ruche_texture,NULL,&ruche_position))
-    {
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_ExitWithError("Failed to render Copy the Hive");
-    }
-    SDL_RenderPresent(renderer);
-    SDL_RenderClear(renderer);
-
-}
-*/
-void Display(float Temp_écoulé)
-{
-    SDL_SetRenderDrawColor(renderer,0,0,0,255);
-    SDL_RenderClear(renderer);
-
-    SDL_Surface *surface_background = SDL_LoadBMP(BACKGROUND_IMAGE);
-    SDL_Surface *Ruche_surface = SDL_LoadBMP(HIVE_IMAGE);
-    SDL_Surface *BEE_surface = SDL_LoadBMP(BEES_IMAGE);
-    if(surface_background == NULL)
-    {
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_ExitWithError("Failed to load image");
-    }
-
-    SDL_Texture *texture_background = SDL_CreateTextureFromSurface(renderer, surface_background);
-    SDL_Texture *Ruche_texture = SDL_CreateTextureFromSurface(renderer, Ruche_surface);
-    SDL_Texture *BEE_texture = SDL_CreateTextureFromSurface(renderer, BEE_surface);
-    SDL_FreeSurface(surface_background);
-    SDL_FreeSurface(Ruche_surface);
-    SDL_FreeSurface(BEE_surface);
-
-    if(texture_background == NULL)
-    {
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_ExitWithError("Failed to create texture");
-    }
-    SDL_Rect Background;
-    if (SDL_QueryTexture(texture_background, NULL,NULL,&Background.w, &Background.h)!= 0)
-    {
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_ExitWithError("Failed to load texture");
-    }
-    Background.x = (WINDOW_WIDTH - Background.w)/2;
-    Background.y = (WINDOW_HEIGHT - Background.h)/2;
-
-    SDL_Rect ruche_position;
-    if (SDL_QueryTexture(Ruche_texture, NULL,NULL,&ruche_position.w, &ruche_position.h)!= 0)
-    {
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_ExitWithError("Failed to load Hive texture");
-    }
-    ruche_position.x = 20;
-    ruche_position.y = 240;
-    SDL_Rect BEE_position;
-        if (SDL_QueryTexture(BEE_texture, NULL,NULL,&BEE_position.w, &BEE_position.h)!= 0)
-        {
-            SDL_DestroyRenderer(renderer);
-            SDL_DestroyWindow(window);
-            SDL_ExitWithError("Failed to load BEE texture");
-        }
-
-        BEE_position.x = 25;
-        BEE_position.x = BEE_position.x + 5;
-        BEE_position.y = 20;
-    
-
-
-    if(SDL_RenderCopy(renderer,texture_background,NULL,&Background))
-    {
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_ExitWithError("Failed to render Copy");
-    }
-
-    if(SDL_RenderCopy(renderer,Ruche_texture,NULL,&ruche_position))
-    {
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_ExitWithError("Failed to render Copy the Hive");
-    }
-
-    if(SDL_RenderCopy(renderer,BEE_texture,NULL,&BEE_position))
-    {
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_ExitWithError("Failed to render Copy the BEE");
-    }
-    SDL_RenderPresent(renderer);
-    SDL_RenderClear(renderer);
-}
-
-SDL_Window* initSDL()
-{                         // Initialisation et création de fenêtre
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        printf("Raté ...  %s\n", SDL_GetError());
-        return NULL;
-    }
-
-
-    window = SDL_CreateWindow("Hive Simulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-    if (!window) {
-        printf("Raté...  %s\n", SDL_GetError());
-        SDL_Quit();
-        return NULL;
-    }
-
-    return window;
-}
-
-int main(int argc, char **argv){
-
+    init_TTF();
     SDL_Window* window = initSDL();
-
+    Uint32 Start_tick = SDL_GetTicks();                    // Chronomètre qui commence dès que le SDL init est en route
+    Uint32 Start_tick_player = SDL_GetTicks();
+    TTF_Font* font = TTF_OpenFont("Config/Roboto-BlackItalic.ttf", 24); // mettre le bon nom du fichier
     
     if (!window) {
         return 1;
     }
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
+    
     printf("Game's Loading...\n");
     
-    Uint32 Dernier_Tick = SDL_GetTicks();                    // Chronomètre qui commence dès que le SDL init est en route
     SDL_bool program_launched = SDL_TRUE;              
+    int seasonIndex  =0;
 
+
+        // Initialisation de la texture de fond par défaut
+    SDL_Surface* defaultSurface = SDL_LoadBMP("Assets/back_winter.bmp"); // Remplacez par votre chemin d'accès
+    if (!defaultSurface) {
+        printf("Unable to load default background image! SDL_Error: %s\n", SDL_GetError());
+        // Gérez l'erreur comme vous préférez ici (par exemple, quitter le programme)
+    }
+
+    texture_background = SDL_CreateTextureFromSurface(renderer, defaultSurface);
+    if (!texture_background) {
+        printf("Unable to create texture from default background image! SDL_Error: %s\n", SDL_GetError());
+        // Gérez l'erreur comme vous préférez ici
+    }
+
+    SDL_FreeSurface(defaultSurface); // Libérez la surface, elle n'est plus nécessaire
 
     while (program_launched)
     {
+        
         SDL_Event action_utilisateur;
         while (SDL_PollEvent(&action_utilisateur))
         {
@@ -255,34 +56,26 @@ int main(int argc, char **argv){
                     else
                         continue;
             }
-            Uint32 Tick_Actuel = SDL_GetTicks()/1000;
-            Uint32 Differentiel_ticks = Tick_Actuel - Dernier_Tick;
-            float Temp_écoulé = Differentiel_ticks; // Seconde ;)
-            Display(Temp_écoulé);
+            
            // Make_Ruche();
-            Dernier_Tick = Tick_Actuel;
         }
+        // Vérifiez le temps écoulé et changez de saison toutes les 5 secondes en dehors de la boucle SDL_PollEvent
+        Uint32 Differentiel_ticks = SDL_GetTicks() - Start_tick;
+        Uint32 Differentiel_ticks_player = SDL_GetTicks() - Start_tick_player;
+        float Temp_écoulé = Differentiel_ticks/1000.0f; // Seconde ;)
+        float Temp_écoulé_player = Differentiel_ticks_player/1000.0f; //pour que le joueur continue a soir ce qui ce passe 
+        if (Temp_écoulé >= 4)
+        {
+        change_saisons(seasonIndex , &texture_background); // Change la saison
+        seasonIndex++;
+        Start_tick = SDL_GetTicks(); // Réinitialise le chronomètre pour le prochain intervalle
+        }
+        Display(Temp_écoulé_player);
+        
+        
     }
     
     SDL_DestroyWindow(window);
-    SDL_Quit() ;
+    quit(window, renderer,font);
     return EXIT_SUCCESS;
 }
-
-void SDL_ExitWithError(const char *message){
-    SDL_Log("ERREUR : %s > %s\n", message, SDL_GetError());
-    SDL_Quit();
-    exit(EXIT_FAILURE);
-}
-
-/*void shutdown(void) {
-    if(renderer){
-        SDL_DestroyRenderer(renderer);
-    }
-    if(window){
-    SDL_DestroyWindow(window);                      SEGMENTATION FAULT WHENEVER UTILIZED IDK WHY ^^'
-    }              
-    SDL_Quit();
-}*/
-
-// gcc main.c -o SDL $(sdl2-config --cflags --libs)

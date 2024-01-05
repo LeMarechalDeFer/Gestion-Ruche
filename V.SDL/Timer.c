@@ -73,6 +73,22 @@ void timer(SDL_Window* window,SDL_Renderer* renderer, TTF_Font* font)
     }
 
 }
+    void change_saisons(int seasonIndex, SDL_Surface **surface_background) {
+        char* seasons[] = {"spring.bmp", "summer.bmp", "autumn.bmp", "winter.bmp"};
+        char filePath[100] = "Assets/";  // Chemin du dossier contenant les images
+
+        // Concatène le chemin du dossier avec le nom du fichier de l'image de saison correspondante
+        strcat(filePath, seasons[seasonIndex % 4]);
+
+        // Charge l'image correspondante dans la surface
+        *surface_background = SDL_LoadBMP(filePath);
+
+        if(*surface_background == NULL) {
+            printf("Could not load image: %s\n", SDL_GetError());
+        } else {
+            printf("Season changed to: %s\n", seasons[seasonIndex % 4]);
+        }
+    }
 // Main function to create a timer and display it
 int main(int argc, char* args[]) {
     init();
@@ -81,7 +97,8 @@ int main(int argc, char* args[]) {
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     TTF_Font* font = TTF_OpenFont("Roboto-BlackItalic.ttf", 50); // Make sure to provide the correct path to your font file
     timer(window,renderer,font);
-    
+    SDL_Surface *surface_background = SDL_LoadBMP("Assets/spring.bmp");
+
     quit(window, renderer, font);
     return 0;
 }
