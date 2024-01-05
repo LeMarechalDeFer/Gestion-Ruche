@@ -9,7 +9,8 @@
 #define ID_MAX 10000
 
 #define NOMBRE_ABEILLES_MAX 60000
-#define PONTE_MAX_JOUR 2000
+#define PONTE_OUVRIERE_JOUR 2000
+#define PONTE_FAUX_BOURDON_JOUR 50
 
 #define TEMPS_OEUF_REINE_J 3
 #define TEMPS_LARVE_REINE_J 6
@@ -75,11 +76,12 @@ typedef struct Ruche {
 
     unsigned int nombreOuvrieres;
     unsigned int nombreFauxBourdon;
-    unsigned int jourNumero;
     Saisons saison;
     
-} Ruche;
+} Ruche, *RuchePtr;
 
+
+//on utilisera CycleCroissanceAbeilles ADULTE pour les predateurs/nuisibles à leur génération
 typedef	enum CycleCroissanceAbeilles{
     OEUF,
     LARVE,
@@ -87,9 +89,7 @@ typedef	enum CycleCroissanceAbeilles{
     ADULTE
 } CycleCroissanceAbeilles ;
 typedef enum RoleOuvriere {
-    OEUF,
-    LARVE,
-    PUPAISON,
+    AUCUN,
     NETTOYEUSE,
     NOURRICE,
     MAGASINIERE,
@@ -100,7 +100,7 @@ typedef enum RoleOuvriere {
 } RoleOuvriere;
 
 const char* RoleOuvriereStrings[] = {
-    "LARVE", "NETTOYEUSE", "NOURRICE", "MAGASINIERE", "CIRIERE", "VENTILEUSE", "GARDIENNE", "BUTINEUSE"
+    "AUCUN", "NETTOYEUSE", "NOURRICE", "MAGASINIERE", "CIRIERE", "VENTILEUSE", "GARDIENNE", "BUTINEUSE"
 };
 
 // typedef enum Pheromones {
@@ -139,7 +139,7 @@ typedef struct Insecte {
     unsigned int sante; 
     unsigned int age; 
     bool faim;
-    CycleCroissanceAbeilles cycle;
+    CycleCroissanceAbeilles cycleCroissanceAbeilles;
     TypeInsecte type; 
     union {
         Reine reine;
@@ -157,6 +157,7 @@ void print_list(ListeInsectes listeInsectes);
 ListeInsectes GENERATION_push_front_list(ListeInsectes listeInsectes, 
                                         TypeInsecte type, 
                                         RoleOuvriere role,
+                                        CycleCroissanceAbeilles cycleCroissance,
                                         unsigned int age, 
                                         unsigned int sante, 
                                         bool faim);
@@ -169,13 +170,19 @@ ListeInsectes clear_list(ListeInsectes listeInsectes);
 ListeInsectes cycleCroissance(ListeInsectes listeInsectes);
 Saisons cycleSaison(unsigned int *jourNumero);
 
-ListeInsectes cyclePondaisonReine(ListeInsectes listeInsectes, Saisons saison);
+ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche);
+ListeInsectes actionReine(ListeInsectes listeInsectes, Saisons saison);
 ListeInsectes cycledeMort(ListeInsectes listeInsectes, Saisons saisons);
-ListeInsectes cycledeFaim(ListeInsectes listeInsectes, Ruche ruche);
+ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche);
 
 
 
-ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, Saisons saison, Ruche ruche);
+ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, 
+                                Saisons saison, 
+                                RuchePtr ruche,
+                                CycleCroissanceAbeilles cycleCroissanceAbeilles, 
+                                unsigned int *jourNumero
+                                );
 
 /*
 - Cycle de vie : naissance croissance mort 
@@ -183,12 +190,11 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, Saisons saison, Ruch
 - Activité journaliere de reine: 
     - ponte larves
     - auto-gestion/intelligence collective de la colonie 
-- Activité journaliere des ouvrieres avec ces sous categories
-- Activité journaliere faux bourdons
+- Activité journaliere des ouvrieres avec ces sous categories 
+- Activité journaliere faux bourdons (hiver expulse, ete en quete de reine)
 - Ruche
-- Meteo
+- Temperature
 - Prédateurs/ Nuisibles
-- Maladies 
 */
 
 
@@ -258,6 +264,7 @@ void print_list(ListeInsectes listeInsectes){
 ListeInsectes GENERATION_push_front_list(ListeInsectes listeInsectes, 
                                         TypeInsecte type, 
                                         RoleOuvriere role,
+                                        CycleCroissanceAbeilles cycleCroissance,
                                         unsigned int age, 
                                         unsigned int sante, 
                                         bool faim){
@@ -268,6 +275,7 @@ ListeInsectes GENERATION_push_front_list(ListeInsectes listeInsectes,
     }
     nouvelInsecte->id = rand() % ID_MAX; 
     nouvelInsecte->age = age;
+    nouvelInsecte->cycleCroissanceAbeilles = cycleCroissance;
     nouvelInsecte->sante = sante;
     nouvelInsecte->faim = faim;
     nouvelInsecte->type = type;
@@ -315,35 +323,35 @@ ListeInsectes initialisationEssaim(ListeInsectes listeInsectes, unsigned int nbA
     unsigned int nbButineuses = (nbAbeilles * 30) / 100; // 30%
     unsigned int nbFauxBourdon = (nbAbeilles * 3) / 100; // 3%
 
-    listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_REINE, 0, 0, SANTE_MAX, false);
+    listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_REINE, AUCUN, ADULTE, 8, SANTE_MAX, false);
     
     for(i = 0; i < nbLarves; i++) {
-        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, LARVE, 0, SANTE_MAX, false);
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, AUCUN, LARVE, 13, SANTE_MAX, false);
     }
     for(i = 0; i < nbNettoyeuses; i++) {
-        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, NETTOYEUSE, 0, SANTE_MAX, false);
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, NETTOYEUSE, ADULTE, 13, SANTE_MAX, false);
     }
     for(i = 0; i < nbNourrices; i++) {
-        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, NOURRICE, 0, SANTE_MAX, false);
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, NOURRICE, ADULTE, 13, SANTE_MAX, false);
     }
     for(i = 0; i < nbMagasinieres; i++) {
-        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, MAGASINIERE, 0, SANTE_MAX, false);
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, MAGASINIERE, ADULTE, 13, SANTE_MAX, false);
     }
     for(i = 0; i < nbCirieres; i++) {
-        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, CIRIERE, 0, SANTE_MAX, false);
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, CIRIERE, ADULTE, 13, SANTE_MAX, false);
     }
     for(i = 0; i < nbVentileuses; i++) {
-        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, VENTILEUSE, 0, SANTE_MAX, false);
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, VENTILEUSE, ADULTE, 13, SANTE_MAX, false);
     }
     for(i = 0; i < nbGardiennes; i++) {
-        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, GARDIENNE, 0, SANTE_MAX, false);
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, GARDIENNE, ADULTE, 13, SANTE_MAX, false);
     }
     for(i = 0; i < nbButineuses; i++) {
-        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, BUTINEUSE, 0, SANTE_MAX, false);
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, BUTINEUSE, ADULTE, 13, SANTE_MAX, false);
     }
 
     for(i=0; i< nbFauxBourdon; i++ ){
-        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_FAUX_BOURDON, 0, 0, SANTE_MAX, false);
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_FAUX_BOURDON, AUCUN, ADULTE, 13, SANTE_MAX, false);
     }
 
     return listeInsectes;
@@ -385,82 +393,59 @@ ListeInsectes clear_list(ListeInsectes listeInsectes){
     }
 }
 
-typedef	enum CycleCroissanceAbeilles{
-    OEUF,
-    LARVE,
-    PUPAISON,
-    ADULTE
-} cycleCroissance ;
 
-//changer avec l'enum cycledevie
 ListeInsectes cycleCroissance(ListeInsectes listeInsectes){
     if(listeInsectes->type == TYPE_OUVRIERE){
         if(listeInsectes->age >= TEMPS_OEUF_OUVRIERE_J){
-            listeInsectes->data.ouvriere.role = LARVE;
+            listeInsectes->cycleCroissanceAbeilles = LARVE;
         }
         if(listeInsectes->age >= TEMPS_LARVE_OUVRIERE_J){
-            listeInsectes->data.ouvriere.role = PUPAISON;
+            listeInsectes->cycleCroissanceAbeilles = PUPAISON;
         }
         if(listeInsectes->age >= TEMPS_PUPAISON_OUVRIERE_J){
-            listeInsectes->data.ouvriere.role = NETTOYEUSE;
+            listeInsectes->cycleCroissanceAbeilles = ADULTE;
         }
     }
     if(listeInsectes->type == TYPE_FAUX_BOURDON){
         if(listeInsectes->age >= TEMPS_OEUF_FAUX_BOURDON_J){
-            //Larve
+            listeInsectes->cycleCroissanceAbeilles = LARVE;
         } 
         if(listeInsectes->age >= TEMPS_LARVE_FAUX_BOURDON_J){
-            //pupaison
+            listeInsectes->cycleCroissanceAbeilles = PUPAISON;
         }
         if(listeInsectes->age >= TEMPS_PUPAISON_FAUX_BOURDON_J){
-            //adulte
+            listeInsectes->cycleCroissanceAbeilles = ADULTE;
         }
     }
     if(listeInsectes->type == TYPE_REINE){
         if(listeInsectes->age >= TEMPS_OEUF_REINE_J){
-            //Larve
+            listeInsectes->cycleCroissanceAbeilles = LARVE;
         } 
         if(listeInsectes->age >= TEMPS_LARVE_REINE_J){
-            //pupaison
+            listeInsectes->cycleCroissanceAbeilles = PUPAISON;
         }
         if(listeInsectes->age >= TEMPS_PUPAISON_REINE_J){
-            //adulte
+            listeInsectes->cycleCroissanceAbeilles = ADULTE;
         }
     }
-
     return listeInsectes;
 }
 
-ListeInsectes cyclePondaisonReine(ListeInsectes listeInsectes, Saisons saison){
-    
-    if(listeInsectes->type == TYPE_REINE){
-        if(saison == PRINTEMPS || saison == ETE){
-    
-            int i;
-            listeInsectes->data.reine.ponteJournaliere = true;
-            for(i=0; i<PONTE_MAX_JOUR; i++){
-                listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, LARVE, 0, SANTE_MAX, false);
-            }
-        }
-        // if(listeInsectes->data.reine.emmet_feromones){
-        //     //emission de feromones
-        // }
-    }
-}
+
 
 // On assume un depart au debut printemps pour un maximum de ponte et de reserver de nourriture
 Saisons cycleSaison(unsigned int *jourNumero){
-    jourNumero += 1;
-    if(jourNumero >= 1 && jourNumero <= 90){
+    *jourNumero += 1;
+    if(*jourNumero >= 1 && *jourNumero <= 90){
         return PRINTEMPS;
     }
-    else if(jourNumero >= 91 && jourNumero <= 180){
+    else if(*jourNumero >= 91 && *jourNumero <= 180){
         return ETE;
     }
-    else if(jourNumero >= 181 && jourNumero <= 270){
+    else if(*jourNumero >= 181 && *jourNumero <= 270){
         return AUTOMNE;
     }
-    else if(jourNumero >= 271 && jourNumero <= 365){
+    else if(*jourNumero >= 271 && *jourNumero <= 365){
         return HIVER;
     }
     else{
@@ -480,7 +465,7 @@ ListeInsectes cycledeMort(ListeInsectes listeInsectes, Saisons saisons){
     }
     if(listeInsectes->type == TYPE_OUVRIERE){
         if((listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J && (saisons == ETE || saisons == PRINTEMPS)) 
-            || listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_HIVER_J && (saisons == HIVER || saisons == AUTOMNE)){
+            || (listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_HIVER_J && (saisons == HIVER || saisons == AUTOMNE))){
             listeInsectes = pop_front_list(listeInsectes);
         }
     }
@@ -489,24 +474,25 @@ ListeInsectes cycledeMort(ListeInsectes listeInsectes, Saisons saisons){
             listeInsectes = pop_front_list(listeInsectes);
         }
     }
+    return listeInsectes;
 }
 
 // A TESTER !!
-ListeInsectes cycledeFaim(ListeInsectes listeInsectes, Ruche ruche){
-    if(ruche.reserveMiel >= 0 && ruche.reserveEau >= 0 && listeInsectes->type == TYPE_OUVRIERE){
+ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche){
+    if(ruche->reserveMiel > 0 && ruche->reserveEau > 0 && listeInsectes->type == TYPE_OUVRIERE){
         listeInsectes->faim = false;
-        ruche.reserveMiel -= 1;
-        ruche.reserveEau -= 1;
+        ruche->reserveMiel -= 1;
+        ruche->reserveEau -= 1;
     }
-    else if(ruche.reserveMiel >= 0 && ruche.reserveEau >= 0 && listeInsectes->type == TYPE_FAUX_BOURDON){
+    else if(ruche->reserveMiel > 0 && ruche->reserveEau > 0 && listeInsectes->type == TYPE_FAUX_BOURDON){
         listeInsectes->faim = false;
-        ruche.reserveMiel -= 1;
-        ruche.reserveEau -= 1;
+        ruche->reserveMiel -= 1;
+        ruche->reserveEau -= 1;
     }
-    else if(ruche.reserveGeleeRoyale >= 0 && ruche.reserveGeleeRoyale >= 0 && listeInsectes->type == TYPE_REINE){
+    else if(ruche->reserveGeleeRoyale > 0 && ruche->reserveGeleeRoyale > 0 && listeInsectes->type == TYPE_REINE){
         listeInsectes->faim = false;
-        ruche.reserveGeleeRoyale -= 1;
-        ruche.reserveEau -= 1;
+        ruche->reserveGeleeRoyale -= 1;
+        ruche->reserveEau -= 1;
     }  
     else if(listeInsectes->type == TYPE_OURSE || listeInsectes->type == TYPE_GUEPE){
         //implementer nourriture ou non des ourse/guepe ? rand nourriture trouver => agressivité  => rand ruche trouvé => attaque ruche
@@ -516,59 +502,91 @@ ListeInsectes cycledeFaim(ListeInsectes listeInsectes, Ruche ruche){
         listeInsectes->sante -= 25;
 
     }
+    return listeInsectes;
 }
 
+ListeInsectes actionReine(ListeInsectes listeInsectes, Saisons saison){
+    
+    if(listeInsectes->type == TYPE_REINE){
+        if(saison == PRINTEMPS || saison == ETE){
+    
+            int i;
+            listeInsectes->data.reine.ponteJournaliere = true;
+            for(i=0; i<PONTE_OUVRIERE_JOUR; i++){
+                listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, AUCUN, OEUF, 0, SANTE_MAX, false);
+            }
+            for(i=0; i<PONTE_FAUX_BOURDON_JOUR; i++){
+                listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_FAUX_BOURDON, AUCUN, OEUF, 0, SANTE_MAX, false);
+            }
+        }
+        else{
+            listeInsectes->data.reine.ponteJournaliere = false;
+        } 
+    }
+    // if(listeInsectes->data.reine.emmet_feromones){
+    //     //emission de feromones
+    // }
+    return listeInsectes;
+}
 
-ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, Saisons saison, Ruche ruche){
+ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche){
+
+    if(listeInsectes->type == TYPE_OUVRIERE){
+        switch(listeInsectes->data.ouvriere.role){
+            case AUCUN:
+                
+                break;
+            case NETTOYEUSE:
+                
+                break;
+            case NOURRICE:
+                
+                break;
+            case MAGASINIERE:
+                
+                break;
+            case CIRIERE:
+                
+                break;
+            case VENTILEUSE:
+               
+                break;
+            case GARDIENNE:
+                
+                break;
+            case BUTINEUSE:
+                
+                break;
+        }
+    }
+    return listeInsectes;
+}
+
+ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, 
+                                Saisons saison, 
+                                RuchePtr ruche,
+                                CycleCroissanceAbeilles cycleCroissanceAbeilles, 
+                                unsigned int *jourNumero
+                                ){
     if(is_empty_list(listeInsectes)){
         return new_list();
     }
     else{
         while(listeInsectes != NULL){
-            
-            if(listeInsectes->type == TYPE_OUVRIERE){
-                switch(listeInsectes->data.ouvriere.role){
-                    case LARVE:
-                        //tavail nettoyeuse
-                        break;
-                    case NETTOYEUSE:
-                        //tavail nourrice
-                        break;
-                    case NOURRICE:
-                        //tavail magasiniere
-                        break;
-                    case MAGASINIERE:
-                        //tavail cireuse
-                        break;
-                    case CIRIERE:
-                        //tavail ventileuse
-                        break;
-                    case VENTILEUSE:
-                        //tavail gardienne
-                        break;
-                    case GARDIENNE:
-                        //tavail butineuse
-                        break;
-                    case BUTINEUSE:
-                        //tavail butineuse
-                        break;
-                }
-            }
-            if(listeInsectes->type == TYPE_FAUX_BOURDON){
-                // if(listeInsectes->data.FauxBourdon.feromones){
-                //     //emission de feromones
-                // }
-                if(listeInsectes->data.FauxBourdon.enQueteReine){
-                    //en quete de reine
-                }
-            }
+            /*
+            - Saisons
+            - Croissance
+            - Nourriture
+            - Action
+            - Mort 
+            */
             listeInsectes = listeInsectes->next ;
-            
-       
         }
         return listeInsectes;
     }
+            
 }
+
 
 
 
