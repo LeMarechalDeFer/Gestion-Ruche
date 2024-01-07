@@ -1,10 +1,5 @@
-// #include "abeille.h"
+#include "abeille.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include <time.h>
 
 #define ID_MAX 10000
 
@@ -191,7 +186,7 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes,
 - Activité journaliere de reine: 
     - ponte larves
     - auto-gestion/intelligence collective de la colonie 
-- Activité journaliere des ouvrieres avec ces sous categories 
+- Activité journaliere des ouvrieres avec ces sous categoriccccces 
 - Activité journaliere faux bourdons (hiver expulse, ete en quete de reine)
 - Ruche
 - Temperature
@@ -380,8 +375,6 @@ ListeInsectes pop_front_list(ListeInsectes listeInsectes){
         nouvelleTete->previous = NULL;
     }
     return nouvelleTete ;
-
-
 }
 
 ListeInsectes clear_list(ListeInsectes listeInsectes){
@@ -437,7 +430,7 @@ ListeInsectes cycleCroissance(ListeInsectes listeInsectes){
 
 
 
-// On assume un depart au debut printemps pour un maximum de ponte et de reserver de nourriture
+// On assume un depart au debut printemps pour un maximum de ponte et de reserve de nourriture
 Saisons cycleSaison(unsigned int *jourNumero){
     *jourNumero += 1;
     if(*jourNumero >= 1 && *jourNumero <= 90){
@@ -487,6 +480,10 @@ float generationJouraliereTemperature(Saisons SaisonActuelle) {
 // A TESTER !!
 ListeInsectes cycledeMort(ListeInsectes listeInsectes, Saisons saisons){
 
+    if (listeInsectes == NULL) {
+        // La liste est vide, rien à faire
+        return listeInsectes;
+    }
     if(listeInsectes->type == TYPE_REINE){
         if(listeInsectes->age >= DUREE_VIE_MAX_REINE_J){
             listeInsectes = pop_front_list(listeInsectes);
@@ -566,13 +563,19 @@ RuchePtr evenementJouraniler(RuchePtr ruche){
 }
 
 
-ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche){
-
-    if(listeInsectes->type == TYPE_OUVRIERE){
-        switch(listeInsectes->data.ouvriere.role){
+ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche)
+{ 
+    switch(listeInsectes->data.ouvriere.role)
+    {
             case AUCUN:
                 break;
             case NETTOYEUSE:
+                //nettoie la ruche et cadavre
+                while (listeInsectes->data.ouvriere.efficacite > 0 )
+                {
+                    listeInsectes->data.ouvriere.efficacite-=1;
+                    ruche->salete -= 1;
+                }
                 
                 break;
             case NOURRICE:
@@ -593,15 +596,13 @@ ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche){
             case BUTINEUSE:
                 
                 break;
-        }
     }
+    
     return listeInsectes;
 }
 
-ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, 
-                                RuchePtr ruche,
-                                unsigned int *jourNumero
-                                ){
+ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche,unsigned int *jourNumero)
+{
     if(is_empty_list(listeInsectes)){
         return new_list();
     }
@@ -618,20 +619,20 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes,
         
         ListeInsectes insecteActuel = listeInsectes;
         ListeInsectes prev = NULL;
-        while(insecteActuel != NULL){
+        while(insecteActuel != NULL)
+        {
 
             insecteActuel = cycleCroissance(insecteActuel);
             insecteActuel = cycledeFaim(insecteActuel, ruche);
-                
+
             //insecteActuel = actionReine(listeInsectes, saison); 
             
-            // //insecteActuel= actionFauxBourdon(insecteActuel, saison);
+            // insecteActuel= actionFauxBourdon(insecteActuel, saison);
             // insecteActuel = actionOuvriere(insecteActuel, ruche);
 
             //insecteActuel = cycledeMort(insecteActuel, saison);
 
             insecteActuel = insecteActuel->next;
-        
         }
         return listeInsectes;
     }
@@ -659,29 +660,5 @@ RuchePtr initialisationRuche(){
 
 
 
-int main(){
-    srand(time(NULL));
-    unsigned int *jourNumero = malloc(sizeof(unsigned int));
-    *jourNumero = 0;
 
-    RuchePtr maRuche = initialisationRuche();
-    ListeInsectes mesInsectes = new_list();
-    print_list(mesInsectes);
-
-    mesInsectes = initialisationEssaim(mesInsectes, 50);
-    maRuche = initialisationRuche(maRuche);
-    print_list(mesInsectes);
-    printf("Taille de la liste: %u\n", list_length(mesInsectes));
-
-    mesInsectes = tourDeSimulation(mesInsectes, maRuche, jourNumero);
-    
-    print_list(mesInsectes);
-
-    mesInsectes = clear_list(mesInsectes);  
-    print_list(mesInsectes);
-
-    free(jourNumero);
-
-    
-}
 
