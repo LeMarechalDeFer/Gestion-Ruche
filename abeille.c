@@ -1,6 +1,16 @@
 #include "abeille.h"
 
+const char* RoleOuvriereStrings[] = {
+    "AUCUN", "NETTOYEUSE", "NOURRICE", "MAGASINIERE", "CIRIERE", "VENTILEUSE", "GARDIENNE", "BUTINEUSE"
+};
 
+const char *CycleCroissanceAbeillesStrings[] = {
+    "OEUF", "LARVE", "PUPAISON", "ADULTE"
+};
+
+const char* SaisonsStrings[] = {
+    "PRINTEMPS", "ETE", "AUTOMNE", "HIVER"
+};
 
 ListeInsectes new_list(void){
     return NULL;

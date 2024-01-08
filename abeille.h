@@ -1,3 +1,5 @@
+#ifndef __RUCHE_H__
+#define __RUCHE_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,9 +64,7 @@ typedef enum Saisons {
     HIVER
 } Saisons;
 
-const char* SaisonsStrings[] = {
-    "PRINTEMPS", "ETE", "AUTOMNE", "HIVER"
-};
+
 typedef struct Ruche {
     float temperature;
     float salete;
@@ -89,9 +89,7 @@ typedef	enum CycleCroissanceAbeilles{
     ADULTE
 } CycleCroissanceAbeilles ;
 
-const char *CycleCroissanceAbeillesStrings[] = {
-    "OEUF", "LARVE", "PUPAISON", "ADULTE"
-};
+
 typedef enum RoleOuvriere {
     AUCUN,
     NETTOYEUSE,
@@ -103,9 +101,6 @@ typedef enum RoleOuvriere {
     BUTINEUSE
 } RoleOuvriere;
 
-const char* RoleOuvriereStrings[] = {
-    "AUCUN", "NETTOYEUSE", "NOURRICE", "MAGASINIERE", "CIRIERE", "VENTILEUSE", "GARDIENNE", "BUTINEUSE"
-};
 
 // typedef enum Pheromones {
 //     INCITATRICE,
@@ -198,3 +193,5 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes,
 - Temperature
 - Prédateurs/ Nuisibles
 */
+
+#endif
