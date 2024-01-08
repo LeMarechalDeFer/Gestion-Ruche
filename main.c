@@ -7,7 +7,6 @@ int main()
     *jourNumero = 0;
 
 
-
     RuchePtr maRuche = initialisationRuche();
     ListeInsectes mesInsectes = new_list();
     print_list(mesInsectes);

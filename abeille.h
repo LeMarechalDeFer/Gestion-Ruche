@@ -44,8 +44,8 @@
 
 
 #define CAPACITE_MAX_POLLEN_CELLULE_G 500 
-#define CAPACITE_MAX_MIEL_CELLULE_g 1000 
-#define CAPACITE_MAX_GELEE_ROYALE_CELLULE_G 100 
+#define CAPACITE_MAX_MIEL_CELLULE_g 100 
+//#define CAPACITE_MAX_GELEE_ROYALE_CELLULE_G 100 
 #define CAPACITE_MAX_EAU_CELLULE_ML 250 
 
 #define NOMBRE_MAX_OUVRIERES 60000 
@@ -74,6 +74,8 @@ typedef struct Ruche {
     unsigned int reserveEau;
     unsigned int reservePollen;
     unsigned int reserveGeleeRoyale;
+    
+    unsigned int Nectar;
 
     unsigned int nombreOuvrieres;
     unsigned int nombreFauxBourdon;
@@ -140,6 +142,7 @@ typedef struct Insecte {
     bool faim;
     CycleCroissanceAbeilles cycleCroissanceAbeilles;
     TypeInsecte type; 
+    
     union {
         Reine reine;
         Ouvriere ouvriere;

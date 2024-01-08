@@ -24,6 +24,5 @@ $(TARGET): $(OBJ)
 # Nettoyage
 clean:
 	rm -f $(OBJ) $(TARGET)
-
 # Déclaration des cibles qui ne correspondent pas à des fichiers
 .PHONY: clean
