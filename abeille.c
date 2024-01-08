@@ -281,7 +281,7 @@ Saisons cycleSaison(unsigned int *jourNumero){
 
 float generationJouraliereTemperature(Saisons SaisonActuelle) {
 
-    srand(time(NULL));
+    //srand(time(NULL));
     
     float temperature;
     
@@ -333,29 +333,29 @@ ListeInsectes cycledeMort(ListeInsectes listeInsectes, Saisons saisons){
 }
 
 
-ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, int ID){
-    ListeInsectes Indice = malloc(sizeof(Ouvriere));
-    ListeInsectes Recherche_Indice = malloc(sizeof(Ouvriere));
-    int ID_Recherche = -1;
+// ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, int ID){
+//     ListeInsectes Indice = malloc(sizeof(Ouvriere));
+//     ListeInsectes Recherche_Indice = malloc(sizeof(Ouvriere));
+//     int ID_Recherche = -1;
 
-    if(Indice == NULL){
-        perror("Erreur allocation mémoire\n");
-        exit(EXIT_FAILURE);
-    }
+//     if(Indice == NULL){
+//         perror("Erreur allocation mémoire\n");
+//         exit(EXIT_FAILURE);
+//     }
 
-    ID_Recherche = Recherche_Indice->id;
+//     ID_Recherche = Recherche_Indice->id;
 
-    while (ID!=ID_Recherche){
-        Indice->next;
-        Recherche_Indice->next;
-        ID_Recherche = Recherche_Indice->id;
-    }
-    Indice->previous;
-    Indice->next =Recherche_Indice->next;
-    free(Recherche_Indice);
+//     while (ID!=ID_Recherche){
+//         Indice->next;
+//         Recherche_Indice->next;
+//         ID_Recherche = Recherche_Indice->id;
+//     }
+//     Indice->previous;
+//     Indice->next =Recherche_Indice->next;
+//     free(Recherche_Indice);
 
-    return Indice ;
-}
+//     return Indice ;
+// }
 
 
 // ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, int ID){
@@ -396,29 +396,6 @@ ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche){
     return listeInsectes;
 }
 
-ListeInsectes actionReine(ListeInsectes listeInsectes, Saisons saison){
-    
-    if(listeInsectes->type == TYPE_REINE){
-        printf("Reine\n");
-        if(saison == PRINTEMPS || saison == ETE){
-            
-            int i;
-            listeInsectes->data.reine.ponteJournaliere = true;
-            for(i=0; i<PONTE_OUVRIERE_JOUR; i++){
-                
-                listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, AUCUN, OEUF, 0, SANTE_MAX, false);
-            }
-            for(i=0; i<PONTE_FAUX_BOURDON_JOUR; i++){
-                listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_FAUX_BOURDON, AUCUN, OEUF, 0, SANTE_MAX, false);
-            }
-        }
-        else{
-            listeInsectes->data.reine.ponteJournaliere = false;
-        } 
-    }
-
-    return listeInsectes;
-}
 
 RuchePtr evenementJouraniler(RuchePtr ruche){
     ruche->salete += 1;
@@ -466,6 +443,54 @@ ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche)
     return listeInsectes;
 }
 
+ListeInsectes fusionliste(ListeInsectes listeInsectes, ListeInsectes listeInsectes2) {
+    if (listeInsectes == NULL) {
+        return listeInsectes2;
+    }
+
+    ListeInsectes courant = listeInsectes;
+    while (courant->next != NULL) {
+        courant = courant->next;
+    }
+    courant->next = listeInsectes2;
+
+    return listeInsectes;
+}
+
+
+ListeInsectes actionReine(ListeInsectes listeInsectes, bool reine_Va_Pondre){
+    if(reine_Va_Pondre == true){
+        printf("Reine\n");
+        int i;
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, AUCUN, OEUF, 0, SANTE_MAX, false);
+        for(i=0; i<PONTE_OUVRIERE_JOUR; i++){
+            
+            listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, AUCUN, OEUF, 0, SANTE_MAX, false);
+        }
+        for(i=0; i<PONTE_FAUX_BOURDON_JOUR; i++){
+            listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_FAUX_BOURDON, AUCUN, OEUF, 0, SANTE_MAX, false);
+        }
+    }
+    return listeInsectes;
+}
+
+bool reineVaPondre(Saisons saison, ListeInsectes listeInsectes){
+    if(listeInsectes->type == TYPE_REINE){
+        //printf("C'est la reine Reine \n");
+        if(saison == PRINTEMPS || saison == ETE){  
+            
+            listeInsectes->data.reine.ponteJournaliere = true;
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    else{
+        return false;
+    }
+
+}
 ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsigned int *jourNumero)
 {
     if(is_empty_list(listeInsectes)){
@@ -483,34 +508,34 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
         printf("Jour numéro: %u\n",*jourNumero);
         printf("Temperature: %f\n", ruche->temperature);
         printf("Taille de la liste: %u\n", list_length(listeInsectes));
-        printf("Le nombre de naissances: %u\n", list_length(listeInsectes));// à ajuster
-        printf("Le nombre de morts: %u\n", list_length(listeInsectes));// à ajuster
+        // printf("Le nombre de naissances: %u\n", list_length(listeInsectes));// à ajuster
+        // printf("Le nombre de morts: %u\n", list_length(listeInsectes));// à ajuster
         printf("_______________________________________________________________________________________________________\n");
-
         
+        ListeInsectes insecteActuel = listeInsectes;
+        ListeInsectes prev = NULL;
+        bool reine_Va_Pondre = false;
         
-        // ListeInsectes insecteActuel = listeInsectes;
-        // //ListeInsectes prev = NULL;
-        // while(insecteActuel != NULL)
-        // {
-
-        //     //insecteActuel = cycleCroissance(insecteActuel);
-        //     //insecteActuel = cycledeFaim(insecteActuel, ruche);
-
-        //     //insecteActuel = actionReine(listeInsectes, saison); 
+        while(insecteActuel != NULL)
+        {
             
-        //     // insecteActuel= actionFauxBourdon(insecteActuel, saison);
-        //     // insecteActuel = actionOuvriere(insecteActuel, ruche);
-
-        //     //insecteActuel = cycledeMort(insecteActuel, saison);
-
-        //     insecteActuel = insecteActuel->next;
-        // }
+            insecteActuel = cycleCroissance(insecteActuel);
+            insecteActuel = cycledeFaim(insecteActuel, ruche);
+            
+            
+            reine_Va_Pondre = reineVaPondre(saison, insecteActuel);
+            //printf("reine_Va_Pondre: %s\n", reine_Va_Pondre ? "Oui" : "Non");
+            insecteActuel = insecteActuel->next;
+        }
+        
+        listeInsectes = actionReine(listeInsectes, reine_Va_Pondre);
         
         return listeInsectes;
     }
             
 }
+
+
 
 //initialisation de la ruche
 RuchePtr initialisationRuche(){

@@ -170,12 +170,12 @@ ListeInsectes cycleCroissance(ListeInsectes listeInsectes);
 Saisons cycleSaison(unsigned int *jourNumero);
 
 ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche);
-ListeInsectes actionReine(ListeInsectes listeInsectes, Saisons saison);
+ListeInsectes actionReine(ListeInsectes listeInsectes, bool reine_Va_Pondre);
 ListeInsectes cycledeMort(ListeInsectes listeInsectes, Saisons saisons);
 ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche);
 
 RuchePtr initialisationRuche();
-
+void addListToEnd(ListeInsectes *mainList, ListeInsectes listeToAdd);
 ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, 
                                 RuchePtr ruche,
                                 unsigned int *jourNumero

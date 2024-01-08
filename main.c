@@ -12,11 +12,11 @@ int main()
     ListeInsectes mesInsectes = new_list();
     print_list(mesInsectes);
 
-    mesInsectes = initialisationEssaim(mesInsectes, 30);
+    mesInsectes = initialisationEssaim(mesInsectes, 10);
     maRuche = initialisationRuche(maRuche);
 
     
-    int NBR_DE_TOURS =100; //choisir le nombre de jours
+    int NBR_DE_TOURS =4; //choisir le nombre de jours
     for(int i=0;i<NBR_DE_TOURS;i++){
         mesInsectes = tourDeSimulation(mesInsectes, maRuche, jourNumero);
     }
