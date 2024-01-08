@@ -174,7 +174,7 @@ ListeInsectes actionReine(ListeInsectes listeInsectes, Saisons saison);
 ListeInsectes cycledeMort(ListeInsectes listeInsectes, Saisons saisons);
 ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche);
 
-
+RuchePtr initialisationRuche();
 
 ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, 
                                 RuchePtr ruche,

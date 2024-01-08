@@ -1,5 +1,7 @@
 #include "abeille.h"
 
+
+
 const char* RoleOuvriereStrings[] = {
     "AUCUN", "NETTOYEUSE", "NOURRICE", "MAGASINIERE", "CIRIERE", "VENTILEUSE", "GARDIENNE", "BUTINEUSE"
 };
@@ -418,7 +420,7 @@ ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche)
     return listeInsectes;
 }
 
-ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche,unsigned int *jourNumero)
+ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsigned int *jourNumero)
 {
     if(is_empty_list(listeInsectes)){
         return new_list();
@@ -429,28 +431,31 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche,unsig
         printf("Saison: %s\n", SaisonsStrings[saison]);
         printf("Jour numéro: %u\n", *jourNumero);
         
+        
+        
         ruche->temperature = generationJouraliereTemperature(saison);
         printf("Temperature: %f\n", ruche->temperature);
 
-        ruche = evenementJouraniler(ruche);
+        //ruche = evenementJouraniler(ruche);
         
-        ListeInsectes insecteActuel = listeInsectes;
-        ListeInsectes prev = NULL;
-        while(insecteActuel != NULL)
-        {
+        // ListeInsectes insecteActuel = listeInsectes;
+        // //ListeInsectes prev = NULL;
+        // while(insecteActuel != NULL)
+        // {
 
-            insecteActuel = cycleCroissance(insecteActuel);
-            insecteActuel = cycledeFaim(insecteActuel, ruche);
+        //     //insecteActuel = cycleCroissance(insecteActuel);
+        //     //insecteActuel = cycledeFaim(insecteActuel, ruche);
 
-            //insecteActuel = actionReine(listeInsectes, saison); 
+        //     //insecteActuel = actionReine(listeInsectes, saison); 
             
-            // insecteActuel= actionFauxBourdon(insecteActuel, saison);
-            // insecteActuel = actionOuvriere(insecteActuel, ruche);
+        //     // insecteActuel= actionFauxBourdon(insecteActuel, saison);
+        //     // insecteActuel = actionOuvriere(insecteActuel, ruche);
 
-            //insecteActuel = cycledeMort(insecteActuel, saison);
+        //     //insecteActuel = cycledeMort(insecteActuel, saison);
 
-            insecteActuel = insecteActuel->next;
-        }
+        //     insecteActuel = insecteActuel->next;
+        // }
+        
         return listeInsectes;
     }
             
