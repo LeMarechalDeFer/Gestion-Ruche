@@ -39,6 +39,20 @@ int list_length(ListeInsectes listeInsectes){
     return length ;
 }
 
+int list_length_type(ListeInsectes listeInsectes, TypeInsecte type){
+    int length = 0;
+
+    if(!is_empty_list(listeInsectes)){
+        while(listeInsectes != NULL){
+            if(listeInsectes->type == type){
+                length += 1;
+            }
+            listeInsectes = listeInsectes->next ;
+        }
+    }
+    return length ;
+}
+
 void print_list(ListeInsectes listeInsectes){  
     if(is_empty_list(listeInsectes)){
         printf("La liste est vide\n");
@@ -396,6 +410,75 @@ ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche){
     return listeInsectes;
 }
 
+ListeInsectes pop_specific_type(ListeInsectes liste, TypeInsecte type){
+    ListeInsectes insecteActuel = liste;
+    ListeInsectes prev = NULL;
+    while(insecteActuel != NULL){
+        if(insecteActuel->type == type){
+            if(prev == NULL){
+                liste->data.ouvriere.cohesion = 0; //Si le nombre d'abeille est trop grand, on supprime les abeilles en trop en mettant la cohesion a 0 
+                liste = pop_front_list(liste);
+                insecteActuel = liste;
+                break;
+            }
+            else{
+                prev->next = insecteActuel->next;
+                free(insecteActuel);
+                insecteActuel = prev->next;
+                break;
+            }
+        }
+        else{
+            prev = insecteActuel;
+            insecteActuel = insecteActuel->next;
+        }
+    }
+    return liste;
+}
+
+ListeInsectes nombreMaxAbeille(ListeInsectes listeInsectes) {
+    while(list_length_type(listeInsectes, TYPE_OUVRIERE) > NOMBRE_MAX_OUVRIERES) {
+        //printf("Nombre d'ouvrieres trop grand\n");
+        listeInsectes = pop_specific_type(listeInsectes, TYPE_OUVRIERE);
+    }
+    while(list_length_type(listeInsectes, TYPE_FAUX_BOURDON) > NOMBRE_MAX_FAUX_BOURDONS) {
+        listeInsectes = pop_specific_type(listeInsectes, TYPE_FAUX_BOURDON);
+    }
+    return listeInsectes;
+}
+
+
+
+ListeInsectes competenceMaxAbeille(ListeInsectes listeInsectes){
+    if(listeInsectes->type == TYPE_OUVRIERE || listeInsectes->type == TYPE_FAUX_BOURDON){
+        if(listeInsectes->data.ouvriere.cohesion > COHESION_MAX){
+            listeInsectes->data.ouvriere.cohesion = COHESION_MAX;
+        }
+        if(listeInsectes->data.ouvriere.efficacite > EFFICACITE_MAX){
+            listeInsectes->data.ouvriere.efficacite = EFFICACITE_MAX;
+        }
+        // if(listeInsectes->data.ouvriere.experience > EXPERIENCE_MAX){
+        //     listeInsectes->data.ouvriere.experience = EXPERIENCE_MAX;
+        // }
+    }
+    return listeInsectes;
+}
+
+RuchePtr capaciteMaxRuche(RuchePtr ruche){
+    if(ruche->reserveMiel > CAPACITE_MAX_MIEL_g){
+        ruche->reserveMiel = CAPACITE_MAX_MIEL_g;
+    }
+    if(ruche->reserveEau > CAPACITE_MAX_EAU_ML){
+        ruche->reserveEau = CAPACITE_MAX_EAU_ML;
+    }
+    if(ruche->reservePollen > CAPACITE_MAX_POLLEN_G){
+        ruche->reservePollen = CAPACITE_MAX_POLLEN_G;
+    }
+    if(ruche->reserveGeleeRoyale > CAPACITE_MAX_GELEE_ROYALE_G){
+        ruche->reserveGeleeRoyale = CAPACITE_MAX_GELEE_ROYALE_G;
+    }
+    return ruche;
+}
 
 RuchePtr evenementJouraniler(RuchePtr ruche){
     ruche->salete += 1;
@@ -486,7 +569,7 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
         ruche = evenementJouraniler(ruche);
 
         printf("_______________________________________________________________________________________________________\n\n");
-        print_list(listeInsectes);
+        //print_list(listeInsectes);
         printf("Jour numéro: %u\n", *jourNumero);
         printf("Saison: %s\n", SaisonsStrings[saison]);
         printf("Jour numéro: %u\n",*jourNumero);
@@ -511,7 +594,7 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
             //printf("reine_Va_Pondre: %s\n", reine_Va_Pondre ? "Oui" : "Non");
             insecteActuel = insecteActuel->next;
         }
-        
+        listeInsectes = nombreMaxAbeille(listeInsectes);
         listeInsectes = actionReine(listeInsectes, reine_Va_Pondre);
         
         return listeInsectes;

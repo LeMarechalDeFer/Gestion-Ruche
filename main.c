@@ -16,7 +16,7 @@ int main()
     maRuche = initialisationRuche(maRuche);
 
     
-    int NBR_DE_TOURS =10; //choisir le nombre de jours
+    int NBR_DE_TOURS =100; //choisir le nombre de jours
     for(int i=0;i<NBR_DE_TOURS;i++){
         mesInsectes = tourDeSimulation(mesInsectes, maRuche, jourNumero);
     }
