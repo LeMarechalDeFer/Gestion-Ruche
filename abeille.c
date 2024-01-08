@@ -443,28 +443,13 @@ ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche)
     return listeInsectes;
 }
 
-ListeInsectes fusionliste(ListeInsectes listeInsectes, ListeInsectes listeInsectes2) {
-    if (listeInsectes == NULL) {
-        return listeInsectes2;
-    }
-
-    ListeInsectes courant = listeInsectes;
-    while (courant->next != NULL) {
-        courant = courant->next;
-    }
-    courant->next = listeInsectes2;
-
-    return listeInsectes;
-}
 
 
 ListeInsectes actionReine(ListeInsectes listeInsectes, bool reine_Va_Pondre){
     if(reine_Va_Pondre == true){
-        printf("Reine\n");
+        //printf("Reine\n");
         int i;
-        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, AUCUN, OEUF, 0, SANTE_MAX, false);
         for(i=0; i<PONTE_OUVRIERE_JOUR; i++){
-            
             listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, AUCUN, OEUF, 0, SANTE_MAX, false);
         }
         for(i=0; i<PONTE_FAUX_BOURDON_JOUR; i++){
@@ -478,7 +463,6 @@ bool reineVaPondre(Saisons saison, ListeInsectes listeInsectes){
     if(listeInsectes->type == TYPE_REINE){
         //printf("C'est la reine Reine \n");
         if(saison == PRINTEMPS || saison == ETE){  
-            
             listeInsectes->data.reine.ponteJournaliere = true;
             return true;
         }
