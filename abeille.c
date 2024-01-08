@@ -69,6 +69,12 @@ void print_list(ListeInsectes listeInsectes){
                             listeInsectes->data.FauxBourdon.feromones ? "Oui" : "Non",
                             listeInsectes->data.FauxBourdon.enQueteReine ? "Oui" : "Non");
                     break;
+                case TYPE_OURSE:
+                    printf("Type: Ourse\n");
+                    break;
+                case TYPE_GUEPE:
+                    printf("Type: Guepe\n");
+                    break;
             }
             listeInsectes = listeInsectes->next ; 
         }
@@ -111,6 +117,10 @@ ListeInsectes GENERATION_push_front_list(ListeInsectes listeInsectes,
         case TYPE_FAUX_BOURDON:
             nouvelInsecte->data.FauxBourdon.feromones = true; 
             nouvelInsecte->data.FauxBourdon.enQueteReine = false; 
+            break;
+        case TYPE_OURSE:
+            break;
+        case TYPE_GUEPE:
             break;
         
     }
@@ -323,6 +333,42 @@ ListeInsectes cycledeMort(ListeInsectes listeInsectes, Saisons saisons){
 }
 
 
+ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, int ID){
+    ListeInsectes Indice = malloc(sizeof(Ouvriere));
+    ListeInsectes Recherche_Indice = malloc(sizeof(Ouvriere));
+    int ID_Recherche = -1;
+
+    if(Indice == NULL){
+        perror("Erreur allocation mémoire\n");
+        exit(EXIT_FAILURE);
+    }
+
+    ID_Recherche = Recherche_Indice->id;
+
+    while (ID!=ID_Recherche){
+        Indice->next;
+        Recherche_Indice->next;
+        ID_Recherche = Recherche_Indice->id;
+    }
+    Indice->previous;
+    Indice->next =Recherche_Indice->next;
+    free(Recherche_Indice);
+
+    return Indice ;
+}
+
+
+// ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, int ID){
+
+//     while(listeInsectes->id != ID){
+//         if(listeInsectes->next == NULL){
+//             return listeInsectes;
+//         }
+
+//         listeInsectes = listeInsectes->next;
+//     }   
+// }
+
 ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche){
     if(ruche->reserveMiel > 0 && ruche->reserveEau > 0 && listeInsectes->type == TYPE_OUVRIERE){
         listeInsectes->faim = false;
@@ -426,17 +472,22 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
         return new_list();
     }
     else{
-        printf("Jour numéro: %u\n", *jourNumero);
         Saisons saison = cycleSaison(jourNumero); 
-        printf("Saison: %s\n", SaisonsStrings[saison]);
-        printf("Jour numéro: %u\n", *jourNumero);
-        
-        
-        
         ruche->temperature = generationJouraliereTemperature(saison);
-        printf("Temperature: %f\n", ruche->temperature);
+        ruche = evenementJouraniler(ruche);
 
-        //ruche = evenementJouraniler(ruche);
+        printf("_______________________________________________________________________________________________________\n\n");
+        print_list(listeInsectes);
+        printf("Jour numéro: %u\n", *jourNumero);
+        printf("Saison: %s\n", SaisonsStrings[saison]);
+        printf("Jour numéro: %u\n",*jourNumero);
+        printf("Temperature: %f\n", ruche->temperature);
+        printf("Taille de la liste: %u\n", list_length(listeInsectes));
+        printf("Le nombre de naissances: %u\n", list_length(listeInsectes));// à ajuster
+        printf("Le nombre de morts: %u\n", list_length(listeInsectes));// à ajuster
+        printf("_______________________________________________________________________________________________________\n");
+
+        
         
         // ListeInsectes insecteActuel = listeInsectes;
         // //ListeInsectes prev = NULL;
