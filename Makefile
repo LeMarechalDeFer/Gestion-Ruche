@@ -5,7 +5,7 @@ TARGET = rucheEXE
 CC = gcc
 
 # Options de compilation
-CFLAGS = -Wall -Wextra -g 
+CFLAGS = -Wall -Wextra -g -O3
 
 # Dépendances (headers)
 DEPS = abeille.h ruche.h #SDL.h
