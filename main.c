@@ -19,12 +19,19 @@ int main()
     int NBR_DE_TOURS =100; //choisir le nombre de jours
     for(int i=0;i<NBR_DE_TOURS;i++){
         mesInsectes = tourDeSimulation(mesInsectes, maRuche, jourNumero);
+        if(mesInsectes  == NULL)
+        {
+        printf("Toute la colonie est morte\n");
+        printf("_______________________________________________________________________________________________________\n");
+        break;
+        }
     }
     
     mesInsectes = clear_list(mesInsectes);  
-    
+        print_list(mesInsectes);
     free(jourNumero);
     return 0;
+
 
     
 }

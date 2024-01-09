@@ -119,6 +119,7 @@ typedef enum TypeInsecte{
 typedef struct Reine {
     bool ponteJournaliere;  
     bool emmet_feromones; 
+     
 } Reine;
 
 typedef struct Ouvriere{
@@ -149,6 +150,11 @@ typedef struct Insecte {
     struct Insecte *previous;
 } Insecte, *ListeInsectes;
 
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+
 ListeInsectes new_list(void);
 bool is_empty_list(ListeInsectes listeInsectes);
 int list_length(ListeInsectes listeInsectes);
@@ -171,7 +177,7 @@ Saisons cycleSaison(unsigned int *jourNumero);
 
 ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche);
 ListeInsectes actionReine(ListeInsectes listeInsectes, Saisons saison);
-ListeInsectes cycledeMort(ListeInsectes listeInsectes, Saisons saisons);
+bool cycledeMort(ListeInsectes insecte);
 ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche);
 
 RuchePtr initialisationRuche();
@@ -180,6 +186,7 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes,
                                 RuchePtr ruche,
                                 unsigned int *jourNumero
                                 );
+ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, unsigned int ID);
 
 /*
 - Cycle de vie : naissance croissance mort 

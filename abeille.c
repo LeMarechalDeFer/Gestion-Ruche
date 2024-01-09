@@ -156,7 +156,7 @@ ListeInsectes initialisationEssaim(ListeInsectes listeInsectes, unsigned int nbA
         listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, AUCUN, LARVE, 0, SANTE_MAX, false);
     }
     for(i = 0; i < nbNettoyeuses; i++) {
-        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, NETTOYEUSE, ADULTE, 100, SANTE_MAX, false);
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, NETTOYEUSE, ADULTE, 13, SANTE_MAX, false);
     }
     for(i = 0; i < nbNourrices; i++) {
         listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, NOURRICE, ADULTE, 13, SANTE_MAX, false);
@@ -186,25 +186,7 @@ ListeInsectes initialisationEssaim(ListeInsectes listeInsectes, unsigned int nbA
 
 
 
-ListeInsectes pop_front_list(ListeInsectes listeInsectes){
-    ListeInsectes nouvelleTete = malloc(sizeof(Ouvriere));
-    if(nouvelleTete == NULL){
-        perror("Erreur allocation mémoire\n");
-        exit(EXIT_FAILURE);
-    }
 
-    if(is_empty_list(listeInsectes)){
-        return new_list();
-    }
-
-    nouvelleTete = listeInsectes->next ; 
-    free(listeInsectes);
-    listeInsectes = NULL;
-    if(!is_empty_list(nouvelleTete)){
-        nouvelleTete->previous = NULL;
-    }
-    return nouvelleTete ;
-}
 
 ListeInsectes clear_list(ListeInsectes listeInsectes){
     if(is_empty_list(listeInsectes)){
@@ -212,7 +194,7 @@ ListeInsectes clear_list(ListeInsectes listeInsectes){
     }
     else{
         while(listeInsectes != NULL){
-            listeInsectes = pop_front_list(listeInsectes);
+            listeInsectes = Kill_Abeille( listeInsectes,  listeInsectes->id);
         }
         return listeInsectes;
     }
@@ -307,7 +289,37 @@ float generationJouraliereTemperature(Saisons SaisonActuelle) {
 
 
 // A TESTER !!
-ListeInsectes cycledeMort(ListeInsectes listeInsectes, Saisons saisons){
+bool cycledeMort(ListeInsectes insecte)
+{
+
+    if (insecte == NULL) {
+        return false;
+    }
+
+    if (insecte->type == TYPE_OUVRIERE && insecte->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J) {
+        return true;
+    }
+    
+    if (insecte->type == TYPE_REINE && insecte->age >=30) { //DUREE_VIE_MAX_REINE_J) {
+        return true;
+    }
+    // Ajoutez ici d'autres conditions pour d'autres types d'insectes
+
+    return false;
+}
+/*
+     if (listeActuelle->type == TYPE_OUVRIERE)
+        {
+            if(listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J){
+                listeInsectes = Kill_Abeille( listeInsectes,  listeActuelle->id);
+            }
+        }
+        if (listeActuelle->type == TYPE_REINE)
+        {
+            if(listeInsectes->age >= 30){
+                listeInsectes = Kill_Abeille( listeInsectes,  listeActuelle->id);
+            }
+        }
 
     if (listeInsectes == NULL) {
         // La liste est vide, rien à faire
@@ -315,47 +327,58 @@ ListeInsectes cycledeMort(ListeInsectes listeInsectes, Saisons saisons){
     }
     if(listeInsectes->type == TYPE_REINE){
         if(listeInsectes->age >= DUREE_VIE_MAX_REINE_J){
-            listeInsectes = pop_front_list(listeInsectes);
+            listeInsectes = Kill_Abeille( listeInsectes,  listeInsectes->id);
         }
     }
     if(listeInsectes->type == TYPE_OUVRIERE){
-        if((listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J && (saisons == ETE || saisons == PRINTEMPS)) 
-            || (listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_HIVER_J && (saisons == HIVER || saisons == AUTOMNE))){
-            listeInsectes = pop_front_list(listeInsectes);
+        if(listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J )
+        {
+            listeInsectes = Kill_Abeille( listeInsectes,  listeInsectes->id);
         }
     }
     if(listeInsectes->type == TYPE_FAUX_BOURDON){
         if(listeInsectes->age >= DUREE_VIE_MAX_FAUX_BOURDON_J){
-            listeInsectes = pop_front_list(listeInsectes);
+            listeInsectes = Kill_Abeille( listeInsectes,  listeInsectes->id);
         }
     }
+    return listeInsectes;
+}*/
+
+ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, unsigned int ID) {
+    if (listeInsectes == NULL) {
+        // Liste vide
+        return NULL;
+    }
+
+    ListeInsectes current = listeInsectes;
+    ListeInsectes previous = NULL;
+
+    while (current != NULL && current->id != ID) {
+        previous = current;
+        current = current->next;
+    }
+
+    if (current == NULL) {
+        // ID non trouvé
+        return listeInsectes;
+    }
+
+    // Vérification pour s'assurer que l'élément n'a pas déjà été libéré
+    if (current->next != NULL) {
+        current->next->previous = previous;
+    }
+    if (previous != NULL) {
+        previous->next = current->next;
+    } else {
+        // Si 'current' est le premier élément
+        listeInsectes = current->next;
+    }
+
+    free(current);
     return listeInsectes;
 }
 
 
-ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, int ID){
-    ListeInsectes Indice = malloc(sizeof(Ouvriere));
-    ListeInsectes Recherche_Indice = malloc(sizeof(Ouvriere));
-    int ID_Recherche = -1;
-
-    if(Indice == NULL){
-        perror("Erreur allocation mémoire\n");
-        exit(EXIT_FAILURE);
-    }
-
-    ID_Recherche = Recherche_Indice->id;
-
-    while (ID!=ID_Recherche){
-        Indice->next;
-        Recherche_Indice->next;
-        ID_Recherche = Recherche_Indice->id;
-    }
-    Indice->previous;
-    Indice->next =Recherche_Indice->next;
-    free(Recherche_Indice);
-
-    return Indice ;
-}
 
 
 // ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, int ID){
@@ -468,6 +491,7 @@ ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche)
 
 ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsigned int *jourNumero)
 {
+        //ListeInsectes prev = NULL;
     if(is_empty_list(listeInsectes)){
         return new_list();
     }
@@ -488,24 +512,43 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
         printf("_______________________________________________________________________________________________________\n");
 
         
-        
-        // ListeInsectes insecteActuel = listeInsectes;
-        // //ListeInsectes prev = NULL;
-        // while(insecteActuel != NULL)
-        // {
+        ListeInsectes listeActuelle = listeInsectes;
+        ListeInsectes next;
+        while(listeActuelle  != NULL)
+        {
+        next = listeActuelle->next; // Sauvegarde du pointeur suivant avant de potentiellement supprimer 'listeActuelle'
 
-        //     //insecteActuel = cycleCroissance(insecteActuel);
-        //     //insecteActuel = cycledeFaim(insecteActuel, ruche);
-
-        //     //insecteActuel = actionReine(listeInsectes, saison); 
+        listeActuelle = cycleCroissance(listeActuelle);
+        listeActuelle = cycledeFaim(listeActuelle, ruche);
+        //insecteActuel = actionReine(listeInsectes, saison); 
             
         //     // insecteActuel= actionFauxBourdon(insecteActuel, saison);
         //     // insecteActuel = actionOuvriere(insecteActuel, ruche);
+       
+        /*if (listeActuelle->type == TYPE_OUVRIERE)
+        {
+            if(listeActuelle->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J){
+                listeInsectes = Kill_Abeille( listeInsectes,  listeActuelle->id);
+            }
+        }
+        if (listeActuelle->type == TYPE_REINE)
+        {
+            if(listeActuelle->age >= 30){
+                listeInsectes = Kill_Abeille( listeInsectes,  listeActuelle->id);
+            }
+        }*/
+        if (cycledeMort(listeActuelle))
+        {
+            listeInsectes = Kill_Abeille(listeInsectes, listeActuelle->id);
+        }
 
-        //     //insecteActuel = cycledeMort(insecteActuel, saison);
+        //listeActuelle = cycledeMort(listeInsectes,listeActuelle, saison);
 
-        //     insecteActuel = insecteActuel->next;
-        // }
+
+        listeActuelle = next; // Utiliser le pointeur sauvegardé
+        
+        }
+        
         
         return listeInsectes;
     }
@@ -513,7 +556,8 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
 }
 
 //initialisation de la ruche
-RuchePtr initialisationRuche(){
+RuchePtr initialisationRuche()
+{
     RuchePtr ruche = malloc(sizeof(Ruche));
     if(ruche == NULL){
         perror("Erreur allocation mémoire\n");
