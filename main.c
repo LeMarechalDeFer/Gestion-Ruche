@@ -12,7 +12,7 @@ int main()
     ListeInsectes mesInsectes = new_list();
     print_list(mesInsectes);
 
-    mesInsectes = initialisationEssaim(mesInsectes, 30);
+    mesInsectes = initialisationEssaim(mesInsectes, 1000);
     maRuche = initialisationRuche(maRuche);
 
     
