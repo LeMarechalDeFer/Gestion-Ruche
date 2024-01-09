@@ -207,7 +207,7 @@ ListeInsectes pop_front_list(ListeInsectes listeInsectes);
 
 bool reineVaPondre(Saisons saison, ListeInsectes listeInsectes);
 bool parcoursListeTrouverReine(ListeInsectes listeInsectes);
-ListeInsectes actionFauxBourdon(ListeInsectes listeInsectes,ListeInsectes listeActuelle, Saisons saison);
+ListeInsectes actionFauxBourdon(ListeInsectes listeInsectes, Saisons saison);
 
 /*
 - Cycle de vie : naissance croissance mort 
