@@ -261,6 +261,7 @@ ListeInsectes cycleCroissance(ListeInsectes listeInsectes){
 
 // On assume un depart au debut printemps pour un maximum de ponte et de reserve de nourriture
 Saisons cycleSaison(unsigned int *jourNumero){
+
     *jourNumero += 1;
     if(*jourNumero >= 1 && *jourNumero <= 90){
         return PRINTEMPS;
@@ -474,7 +475,7 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
     else{
         Saisons saison = cycleSaison(jourNumero); 
         ruche->temperature = generationJouraliereTemperature(saison);
-        ruche = evenementJouraniler(ruche);
+        ruche = evenementJouranilerRuche(ruche);
 
         printf("_______________________________________________________________________________________________________\n\n");
         print_list(listeInsectes);
