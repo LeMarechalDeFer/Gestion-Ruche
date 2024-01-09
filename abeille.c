@@ -519,14 +519,12 @@ ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche)
                 }
             break;
             case NETTOYEUSE:
-                printf("UwU");
                 while (listeInsectes != NULL && listeInsectes->data.ouvriere.role == NETTOYEUSE) 
                 {
                     if (listeInsectes->data.ouvriere.efficacite > 0) 
                     {
                         listeInsectes->data.ouvriere.efficacite -= 4;
                         ruche->salete -= 5;
-                        printf("Nettoyage en cours. Saleté restante : %f\n", ruche->salete);
                     }
                     // Passage à l'abeille suivante
                     listeInsectes = listeInsectes->next;
