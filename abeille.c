@@ -563,12 +563,6 @@ ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche)
                         ruche->salete -= 5;
                         printf("Nettoyage en cours. Saleté restante : %f\n", ruche->salete);
                     }
-
-                    if (listeInsectes->data.ouvriere.efficacite <= 0) {
-                        // Si l'efficacité atteint zéro, la nettoyeuse peut continuer à nettoyer
-                        printf("Nettoyeuse sans efficacité continue de nettoyer.\n");
-                    }
-
                     // Passage à l'abeille suivante
                     listeInsectes = listeInsectes->next;
                 }
@@ -693,7 +687,7 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
             
             insecteActuel = cycleCroissance(insecteActuel);
             insecteActuel = cycledeFaim(insecteActuel, ruche);
-
+            insecteActuel = actionOuvriere(insecteActuel, ruche);
             if (cycledeMort(insecteActuel))
             {
             listeInsectes = Kill_Abeille(listeInsectes, insecteActuel->id);
