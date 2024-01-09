@@ -303,61 +303,29 @@ float generationJouraliereTemperature(Saisons SaisonActuelle) {
 }
 
 
-// A TESTER !!
 bool cycledeMort(ListeInsectes insecte)
 {
 
     if (insecte == NULL) {
         return false;
     }
-
+    if ( insecte->sante == 0) {
+        return true;
+    }
     if (insecte->type == TYPE_OUVRIERE && insecte->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J) {
         return true;
     }
-    
-    if (insecte->type == TYPE_REINE && insecte->age >=30) { //DUREE_VIE_MAX_REINE_J) {
+
+    if (insecte->type == TYPE_REINE && insecte->age >=DUREE_VIE_MAX_REINE_J) { //DUREE_VIE_MAX_REINE_J) {
+        return true;
+    }
+    if (insecte->type == TYPE_FAUX_BOURDON && insecte->age >=DUREE_VIE_MAX_FAUX_BOURDON_J) { //DUREE_VIE_MAX_REINE_J) {
         return true;
     }
     // Ajoutez ici d'autres conditions pour d'autres types d'insectes
 
     return false;
 }
-/*
-     if (listeActuelle->type == TYPE_OUVRIERE)
-        {
-            if(listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J){
-                listeInsectes = Kill_Abeille( listeInsectes,  listeActuelle->id);
-            }
-        }
-        if (listeActuelle->type == TYPE_REINE)
-        {
-            if(listeInsectes->age >= 30){
-                listeInsectes = Kill_Abeille( listeInsectes,  listeActuelle->id);
-            }
-        }
-
-    if (listeInsectes == NULL) {
-        // La liste est vide, rien à faire
-        return listeInsectes;
-    }
-    if(listeInsectes->type == TYPE_REINE){
-        if(listeInsectes->age >= DUREE_VIE_MAX_REINE_J){
-            listeInsectes = Kill_Abeille( listeInsectes,  listeInsectes->id);
-        }
-    }
-    if(listeInsectes->type == TYPE_OUVRIERE){
-        if(listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J )
-        {
-            listeInsectes = Kill_Abeille( listeInsectes,  listeInsectes->id);
-        }
-    }
-    if(listeInsectes->type == TYPE_FAUX_BOURDON){
-        if(listeInsectes->age >= DUREE_VIE_MAX_FAUX_BOURDON_J){
-            listeInsectes = Kill_Abeille( listeInsectes,  listeInsectes->id);
-        }
-    }
-    return listeInsectes;
-}*/
 
 ListeInsectes pop_front_list(ListeInsectes listeInsectes){
     ListeInsectes nouvelleTete = malloc(sizeof(Ouvriere));
@@ -487,9 +455,6 @@ ListeInsectes nombreMaxAbeille(ListeInsectes listeInsectes) {
 
 ListeInsectes competenceMaxAbeille(ListeInsectes listeInsectes){
     if(listeInsectes->type == TYPE_OUVRIERE || listeInsectes->type == TYPE_FAUX_BOURDON){
-        if(listeInsectes->data.ouvriere.cohesion > COHESION_MAX){
-            listeInsectes->data.ouvriere.cohesion = COHESION_MAX;
-        }
         if(listeInsectes->data.ouvriere.efficacite > EFFICACITE_MAX){
             listeInsectes->data.ouvriere.efficacite = EFFICACITE_MAX;
         }

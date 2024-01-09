@@ -26,7 +26,7 @@ int main()
         }
         
     }
-    print_list(mesInsectes);
+    //print_list(mesInsectes);
     mesInsectes = clear_list(mesInsectes);  
     print_list(mesInsectes);
     free(jourNumero);
