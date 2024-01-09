@@ -427,8 +427,8 @@ ListeInsectes actionReine(ListeInsectes listeInsectes, Saisons saison){
 }
 
 RuchePtr evenementJouraniler(RuchePtr ruche){
-    ruche->salete += 1;
-    ruche->sante -= 1;
+    ruche->salete += 15;
+    ruche->sante -= 30;
     ruche->reservePollen -= 50;
 
     return ruche;
@@ -441,66 +441,100 @@ ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche)
     {
             case AUCUN:
                 break;
-            case NETTOYEUSE:
-                //nettoie la ruche et cadavre
-                while (listeInsectes->data.ouvriere.efficacite > 0 && ruche->salete != 0)
-                {
-                    listeInsectes->data.ouvriere.efficacite-=1;
-                    ruche->salete -= 1;
-                    printf("%f \n",ruche->salete);
-                }
-                break;
-           /* case NOURRICE:
-                while (listeInsectes != NULL) {
-                    if ((listeInsectes->data.ouvriere.efficacite > 0 && listeInsectes->cycleCroissanceAbeilles == LARVE) ||(listeInsectes->data.ouvriere.efficacite > 0 && listeInsectes->cycleCroissanceAbeilles == OEUF)&&(listeInsectes->data.ouvriere.efficacite > 0 && listeInsectes->cycleCroissanceAbeilles == PUPAISON))  {
-                        printf("Found a LARVE!\n");
-                        if(listeInsectes->faim == true)
+           case NOURRICE:
+            
+                while (listeInsectes != NULL && listeInsectes->data.ouvriere.role == NOURRICE) {
+                    if ((listeInsectes->data.ouvriere.efficacite > 0 && listeInsectes->cycleCroissanceAbeilles == LARVE) ||
+                        (listeInsectes->data.ouvriere.efficacite > 0 && listeInsectes->cycleCroissanceAbeilles == OEUF) ||
+                        (listeInsectes->data.ouvriere.efficacite > 0 && listeInsectes->cycleCroissanceAbeilles == PUPAISON)) {
+                            if (listeInsectes->faim == true)
                             {
-                                listeInsectes->data.ouvriere.efficacite -= 1;
-                               // listeInsectes->faim = false;
+                                listeInsectes->faim = false;
                             }
                     }
+                            if (listeInsectes->data.ouvriere.role == NOURRICE)
+                            {
+                                listeInsectes->data.ouvriere.efficacite -= 5;
+                            }
                     if (listeInsectes->next != NULL) {
                         listeInsectes = listeInsectes->next;
                     } else {
                         break;
                     }
-                }*/
-            case MAGASINIERE:
-                
-                break;
-            case CIRIERE:
-                while (listeInsectes->data.ouvriere.efficacite > 0 && ruche->sante != SANTE_RUCHE_MAX)
-                {
-                    listeInsectes->data.ouvriere.efficacite -= 1;
-                    ruche->sante += 1;                        
                 }
-                
+            break;
+            case NETTOYEUSE:
+                printf("UwU");
+                while (listeInsectes != NULL && listeInsectes->data.ouvriere.role == NETTOYEUSE) 
+                {
+                    if (listeInsectes->data.ouvriere.efficacite > 0) 
+                    {
+                        listeInsectes->data.ouvriere.efficacite -= 4;
+                        ruche->salete -= 5;
+                        printf("Nettoyage en cours. Saleté restante : %f\n", ruche->salete);
+                    }
+
+                    if (listeInsectes->data.ouvriere.efficacite <= 0) {
+                        // Si l'efficacité atteint zéro, la nettoyeuse peut continuer à nettoyer
+                        printf("Nettoyeuse sans efficacité continue de nettoyer.\n");
+                    }
+
+                    // Passage à l'abeille suivante
+                    listeInsectes = listeInsectes->next;
+                }
+            break;
+            case MAGASINIERE:    
+                break;
+            case CIRIERE:    
+                while (listeInsectes != NULL)
+                {
+                    if (listeInsectes->data.ouvriere.efficacite > 0 && ruche->sante != SANTE_RUCHE_MAX)
+                    {
+                        listeInsectes->data.ouvriere.efficacite -= 1;
+                        ruche->sante += 1;                        
+                    }
+                    if (listeInsectes->next != NULL && listeInsectes->next->data.ouvriere.role == CIRIERE) {
+                        listeInsectes = listeInsectes->next;
+                    } else {
+                        break;
+                    }
+                }
                 break;
             case VENTILEUSE:
-               while (listeInsectes->data.ouvriere.efficacite > 0 && ruche ->temperature > 35)
-               {
-                    listeInsectes->data.ouvriere.efficacite -= 1;
-                    ruche->temperature = (rand()% 45)+ 30;
-                }
-               
-                break;
+            while (listeInsectes != NULL && listeInsectes->data.ouvriere.role == VENTILEUSE)
+              {
+                    if (listeInsectes->data.ouvriere.efficacite > 0 && ruche ->temperature > 35)
+                    {
+                            listeInsectes->data.ouvriere.efficacite -= 1;
+                            ruche->temperature = (rand()% 45)+ 34;
+                    }
+                    if (listeInsectes->next != NULL && listeInsectes->next->data.ouvriere.role == VENTILEUSE) {
+                        listeInsectes = listeInsectes->next;
+                    } else {
+                        break;
+                    }
+              }
+            break;
             case GARDIENNE:
-                while (listeInsectes->data.ouvriere.efficacite > 0 && (listeInsectes->type == TYPE_OURSE || listeInsectes->type == TYPE_GUEPE)  )
+              /*  while (listeInsectes->data.ouvriere.efficacite > 0 && (listeInsectes->type == TYPE_OURSE || listeInsectes->type == TYPE_GUEPE)  )
                 {
                    listeInsectes->data.ouvriere.efficacite -= 10;
                 }
                 
-                
-                break;
+                break;*/
             case BUTINEUSE:
-                while(listeInsectes->data.ouvriere.efficacite > 0 && ruche->reservePollen != 100)
-                {
-                        listeInsectes->data.ouvriere.efficacite -= 1;
-                        ruche->reservePollen += 50;
-                        //ruche->reserveEau += 50;
+                while (listeInsectes != NULL && listeInsectes->data.ouvriere.role == BUTINEUSE) {
+                    if (listeInsectes->data.ouvriere.efficacite > 0 && ruche->reservePollen != CAPACITE_MAX_POLLEN_CELLULE_G) {
+                        ruche->reservePollen += 30;
+                        listeInsectes->data.ouvriere.efficacite -= 1; 
+                    }
+                    if (listeInsectes->next != NULL && listeInsectes->next->data.ouvriere.role == BUTINEUSE) {
+                        listeInsectes = listeInsectes->next;
+                    } else {
+                        break;
+                    }
                 }
-            break;
+                break;
     }
     return listeInsectes;
 }
@@ -533,8 +567,8 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
         while(insecteActuel != NULL)
         {
             insecteActuel = cycleCroissance(insecteActuel);
-            insecteActuel = actionOuvriere(insecteActuel, ruche);   
             insecteActuel = cycledeFaim(insecteActuel, ruche);
+            insecteActuel = actionOuvriere(insecteActuel, ruche);
             insecteActuel = insecteActuel->next;
         }
         
@@ -561,10 +595,10 @@ RuchePtr initialisationRuche(){
     }
     ruche->temperature = 20;
     ruche->sante = SANTE_RUCHE_MAX;
-    ruche->salete = 0;
+    ruche->salete = 15;
     ruche->reserveMiel = 0;
     ruche->reserveEau = 0;
-    ruche->reservePollen = 100;
+    ruche->reservePollen = 0;
     ruche->reserveGeleeRoyale = 0;
     ruche->nombreOuvrieres = 0;
     ruche->nombreFauxBourdon = 0;
