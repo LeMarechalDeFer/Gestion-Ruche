@@ -480,7 +480,8 @@ RuchePtr capaciteMaxRuche(RuchePtr ruche){
     return ruche;
 }
 
-RuchePtr evenementJouraniler(RuchePtr ruche){
+
+RuchePtr evenementJouranilerRuche(RuchePtr ruche){
     ruche->salete += 1;
     ruche->sante -= 1;
 

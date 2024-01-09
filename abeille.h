@@ -176,7 +176,7 @@ ListeInsectes cycledeMort(ListeInsectes listeInsectes, Saisons saisons);
 ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche);
 
 
-
+RuchePtr evenementJouranilerRuche(RuchePtr ruche);
 RuchePtr initialisationRuche();
 
 ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, 
@@ -189,6 +189,8 @@ RuchePtr capaciteMaxRuche(RuchePtr ruche);
 ListeInsectes competenceMaxAbeille(ListeInsectes listeInsectes);
 ListeInsectes pop_specific_type(ListeInsectes liste, TypeInsecte type) ;
 ListeInsectes nombreMaxAbeille(ListeInsectes listeInsectes) ;
+
+
 /*
 - Cycle de vie : naissance croissance mort 
 - Cycle des saisons : Printemps Ete Automne Hiver
