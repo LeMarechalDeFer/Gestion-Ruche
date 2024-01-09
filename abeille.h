@@ -120,6 +120,7 @@ typedef enum TypeInsecte{
 typedef struct Reine {
     bool ponteJournaliere;  
     bool emmet_feromones; 
+     
 } Reine;
 
 typedef struct Ouvriere{
@@ -150,6 +151,10 @@ typedef struct Insecte {
     struct Insecte *previous;
 } Insecte, *ListeInsectes;
 
+
+
+
+
 ListeInsectes new_list(void);
 bool is_empty_list(ListeInsectes listeInsectes);
 int list_length(ListeInsectes listeInsectes);
@@ -162,7 +167,7 @@ ListeInsectes GENERATION_push_front_list(ListeInsectes listeInsectes,
                                         unsigned int sante, 
                                         bool faim);
 ListeInsectes initialisationEssaim(ListeInsectes listeInsectes, unsigned int nbOuvrieres) ;
-ListeInsectes pop_front_list(ListeInsectes listeInsectes);
+
 
 ListeInsectes clear_list(ListeInsectes listeInsectes);
 
@@ -171,8 +176,12 @@ ListeInsectes cycleCroissance(ListeInsectes listeInsectes);
 Saisons cycleSaison(unsigned int *jourNumero);
 
 ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche);
+
+
+bool cycledeMort(ListeInsectes insecte);
+
 ListeInsectes actionReine(ListeInsectes listeInsectes, bool reine_Va_Pondre);
-ListeInsectes cycledeMort(ListeInsectes listeInsectes, Saisons saisons);
+
 ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche);
 
 
@@ -183,12 +192,15 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes,
                                 RuchePtr ruche,
                                 unsigned int *jourNumero
                                 );
+ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, unsigned int ID);
 
 int list_length_type(ListeInsectes listeInsectes, TypeInsecte type);
 RuchePtr capaciteMaxRuche(RuchePtr ruche);                              
 ListeInsectes competenceMaxAbeille(ListeInsectes listeInsectes);
 ListeInsectes pop_specific_type(ListeInsectes liste, TypeInsecte type) ;
 ListeInsectes nombreMaxAbeille(ListeInsectes listeInsectes) ;
+RuchePtr evenementJouranilerRuche(RuchePtr ruche);
+ListeInsectes pop_front_list(ListeInsectes listeInsectes);
 /*
 - Cycle de vie : naissance croissance mort 
 - Cycle des saisons : Printemps Ete Automne Hiver
