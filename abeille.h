@@ -204,6 +204,11 @@ ListeInsectes pop_specific_type(ListeInsectes liste, TypeInsecte type) ;
 ListeInsectes nombreMaxAbeille(ListeInsectes listeInsectes) ;
 RuchePtr evenementJouranilerRuche(RuchePtr ruche);
 ListeInsectes pop_front_list(ListeInsectes listeInsectes);
+
+bool reineVaPondre(Saisons saison, ListeInsectes listeInsectes);
+bool parcoursListeTrouverReine(ListeInsectes listeInsectes);
+ListeInsectes actionFauxBourdon(ListeInsectes listeInsectes,ListeInsectes listeActuelle, Saisons saison);
+
 /*
 - Cycle de vie : naissance croissance mort 
 - Cycle des saisons : Printemps Ete Automne Hiver

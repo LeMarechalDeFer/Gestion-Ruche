@@ -198,8 +198,6 @@ ListeInsectes initialisationEssaim(ListeInsectes listeInsectes, unsigned int nbA
 
 
 
-
-
 ListeInsectes clear_list(ListeInsectes listeInsectes){
     if(is_empty_list(listeInsectes)){
         return new_list() ;
