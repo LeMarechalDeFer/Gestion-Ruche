@@ -15,6 +15,7 @@
 #define PONTE_OUVRIERE_JOUR 2000
 #define PONTE_FAUX_BOURDON_JOUR 50
 
+
 #define TEMPS_OEUF_REINE_J 3
 #define TEMPS_LARVE_REINE_J 6
 #define TEMPS_PUPAISON_REINE_J 7
@@ -43,10 +44,10 @@
 #define EFFICACITER_PAR_DEFAUT 50
 
 
-#define CAPACITE_MAX_POLLEN_CELLULE_G 500 
-#define CAPACITE_MAX_MIEL_CELLULE_g 100 
-//#define CAPACITE_MAX_GELEE_ROYALE_CELLULE_G 100 
-#define CAPACITE_MAX_EAU_CELLULE_ML 250 
+#define CAPACITE_MAX_POLLEN_G 500 
+#define CAPACITE_MAX_MIEL_g 1000 
+#define CAPACITE_MAX_GELEE_ROYALE_G 100 
+#define CAPACITE_MAX_EAU_ML 250 
 
 #define NOMBRE_MAX_OUVRIERES 60000 
 #define NOMBRE_MAX_FAUX_BOURDONS 2000 
@@ -121,10 +122,11 @@ typedef enum TypeInsecte{
 typedef struct Reine {
     bool ponteJournaliere;  
     bool emmet_feromones; 
+     
 } Reine;
 
 typedef struct Ouvriere{
-    unsigned int cohesion;
+    bool cohesion;
     unsigned int efficacite; 
     unsigned int experience; 
     RoleOuvriere role;
@@ -152,6 +154,10 @@ typedef struct Insecte {
     struct Insecte *previous;
 } Insecte, *ListeInsectes;
 
+
+
+
+
 ListeInsectes new_list(void);
 bool is_empty_list(ListeInsectes listeInsectes);
 int list_length(ListeInsectes listeInsectes);
@@ -164,7 +170,7 @@ ListeInsectes GENERATION_push_front_list(ListeInsectes listeInsectes,
                                         unsigned int sante, 
                                         bool faim);
 ListeInsectes initialisationEssaim(ListeInsectes listeInsectes, unsigned int nbOuvrieres) ;
-ListeInsectes pop_front_list(ListeInsectes listeInsectes);
+
 
 ListeInsectes clear_list(ListeInsectes listeInsectes);
 
@@ -173,9 +179,15 @@ ListeInsectes cycleCroissance(ListeInsectes listeInsectes);
 Saisons cycleSaison(unsigned int *jourNumero);
 
 ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche);
-ListeInsectes actionReine(ListeInsectes listeInsectes, Saisons saison);
-ListeInsectes cycledeMort(ListeInsectes listeInsectes, Saisons saisons);
+
+
+bool cycledeMort(ListeInsectes insecte);
+
+ListeInsectes actionReine(ListeInsectes listeInsectes, bool reine_Va_Pondre);
+
 ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche);
+
+
 
 RuchePtr initialisationRuche();
 
@@ -183,7 +195,15 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes,
                                 RuchePtr ruche,
                                 unsigned int *jourNumero
                                 );
+ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, unsigned int ID);
 
+int list_length_type(ListeInsectes listeInsectes, TypeInsecte type);
+RuchePtr capaciteMaxRuche(RuchePtr ruche);                              
+ListeInsectes competenceMaxAbeille(ListeInsectes listeInsectes);
+ListeInsectes pop_specific_type(ListeInsectes liste, TypeInsecte type) ;
+ListeInsectes nombreMaxAbeille(ListeInsectes listeInsectes) ;
+RuchePtr evenementJouranilerRuche(RuchePtr ruche);
+ListeInsectes pop_front_list(ListeInsectes listeInsectes);
 /*
 - Cycle de vie : naissance croissance mort 
 - Cycle des saisons : Printemps Ete Automne Hiver

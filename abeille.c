@@ -39,6 +39,20 @@ int list_length(ListeInsectes listeInsectes){
     return length ;
 }
 
+int list_length_type(ListeInsectes listeInsectes, TypeInsecte type){
+    int length = 0;
+
+    if(!is_empty_list(listeInsectes)){
+        while(listeInsectes != NULL){
+            if(listeInsectes->type == type){
+                length += 1;
+            }
+            listeInsectes = listeInsectes->next ;
+        }
+    }
+    return length ;
+}
+
 void print_list(ListeInsectes listeInsectes){  
     if(is_empty_list(listeInsectes)){
         printf("La liste est vide\n");
@@ -156,7 +170,7 @@ ListeInsectes initialisationEssaim(ListeInsectes listeInsectes, unsigned int nbA
         listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, AUCUN, LARVE, 0, SANTE_MAX, false);
     }
     for(i = 0; i < nbNettoyeuses; i++) {
-        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, NETTOYEUSE, ADULTE, 100, SANTE_MAX, false);
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, NETTOYEUSE, ADULTE, 13, SANTE_MAX, false);
     }
     for(i = 0; i < nbNourrices; i++) {
         listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, NOURRICE, ADULTE, 13, SANTE_MAX, false);
@@ -186,25 +200,7 @@ ListeInsectes initialisationEssaim(ListeInsectes listeInsectes, unsigned int nbA
 
 
 
-ListeInsectes pop_front_list(ListeInsectes listeInsectes){
-    ListeInsectes nouvelleTete = malloc(sizeof(Ouvriere));
-    if(nouvelleTete == NULL){
-        perror("Erreur allocation mémoire\n");
-        exit(EXIT_FAILURE);
-    }
 
-    if(is_empty_list(listeInsectes)){
-        return new_list();
-    }
-
-    nouvelleTete = listeInsectes->next ; 
-    free(listeInsectes);
-    listeInsectes = NULL;
-    if(!is_empty_list(nouvelleTete)){
-        nouvelleTete->previous = NULL;
-    }
-    return nouvelleTete ;
-}
 
 ListeInsectes clear_list(ListeInsectes listeInsectes){
     if(is_empty_list(listeInsectes)){
@@ -212,7 +208,7 @@ ListeInsectes clear_list(ListeInsectes listeInsectes){
     }
     else{
         while(listeInsectes != NULL){
-            listeInsectes = pop_front_list(listeInsectes);
+            listeInsectes = Kill_Abeille( listeInsectes,  listeInsectes->id);
         }
         return listeInsectes;
     }
@@ -261,6 +257,7 @@ ListeInsectes cycleCroissance(ListeInsectes listeInsectes){
 
 // On assume un depart au debut printemps pour un maximum de ponte et de reserve de nourriture
 Saisons cycleSaison(unsigned int *jourNumero){
+
     *jourNumero += 1;
     if(*jourNumero >= 1 && *jourNumero <= 90){
         return PRINTEMPS;
@@ -281,7 +278,7 @@ Saisons cycleSaison(unsigned int *jourNumero){
 
 float generationJouraliereTemperature(Saisons SaisonActuelle) {
 
-    srand(time(NULL));
+    //srand(time(NULL));
     
     float temperature;
     
@@ -307,7 +304,37 @@ float generationJouraliereTemperature(Saisons SaisonActuelle) {
 
 
 // A TESTER !!
-ListeInsectes cycledeMort(ListeInsectes listeInsectes, Saisons saisons){
+bool cycledeMort(ListeInsectes insecte)
+{
+
+    if (insecte == NULL) {
+        return false;
+    }
+
+    if (insecte->type == TYPE_OUVRIERE && insecte->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J) {
+        return true;
+    }
+    
+    if (insecte->type == TYPE_REINE && insecte->age >=30) { //DUREE_VIE_MAX_REINE_J) {
+        return true;
+    }
+    // Ajoutez ici d'autres conditions pour d'autres types d'insectes
+
+    return false;
+}
+/*
+     if (listeActuelle->type == TYPE_OUVRIERE)
+        {
+            if(listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J){
+                listeInsectes = Kill_Abeille( listeInsectes,  listeActuelle->id);
+            }
+        }
+        if (listeActuelle->type == TYPE_REINE)
+        {
+            if(listeInsectes->age >= 30){
+                listeInsectes = Kill_Abeille( listeInsectes,  listeActuelle->id);
+            }
+        }
 
     if (listeInsectes == NULL) {
         // La liste est vide, rien à faire
@@ -315,59 +342,76 @@ ListeInsectes cycledeMort(ListeInsectes listeInsectes, Saisons saisons){
     }
     if(listeInsectes->type == TYPE_REINE){
         if(listeInsectes->age >= DUREE_VIE_MAX_REINE_J){
-            listeInsectes = pop_front_list(listeInsectes);
+            listeInsectes = Kill_Abeille( listeInsectes,  listeInsectes->id);
         }
     }
     if(listeInsectes->type == TYPE_OUVRIERE){
-        if((listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J && (saisons == ETE || saisons == PRINTEMPS)) 
-            || (listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_HIVER_J && (saisons == HIVER || saisons == AUTOMNE))){
-            listeInsectes = pop_front_list(listeInsectes);
+        if(listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J )
+        {
+            listeInsectes = Kill_Abeille( listeInsectes,  listeInsectes->id);
         }
     }
     if(listeInsectes->type == TYPE_FAUX_BOURDON){
         if(listeInsectes->age >= DUREE_VIE_MAX_FAUX_BOURDON_J){
-            listeInsectes = pop_front_list(listeInsectes);
+            listeInsectes = Kill_Abeille( listeInsectes,  listeInsectes->id);
         }
     }
     return listeInsectes;
-}
+}*/
 
-
-ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, int ID){
-    ListeInsectes Indice = malloc(sizeof(Ouvriere));
-    ListeInsectes Recherche_Indice = malloc(sizeof(Ouvriere));
-    int ID_Recherche = -1;
-
-    if(Indice == NULL){
+ListeInsectes pop_front_list(ListeInsectes listeInsectes){
+    ListeInsectes nouvelleTete = malloc(sizeof(Ouvriere));
+    if(nouvelleTete == NULL){
         perror("Erreur allocation mémoire\n");
         exit(EXIT_FAILURE);
     }
 
-    ID_Recherche = Recherche_Indice->id;
-
-    while (ID!=ID_Recherche){
-        Indice->next;
-        Recherche_Indice->next;
-        ID_Recherche = Recherche_Indice->id;
+    if(is_empty_list(listeInsectes)){
+        return new_list();
     }
-    Indice->previous;
-    Indice->next =Recherche_Indice->next;
-    free(Recherche_Indice);
 
-    return Indice ;
+    nouvelleTete = listeInsectes->next ; 
+    free(listeInsectes);
+    listeInsectes = NULL;
+    if(!is_empty_list(nouvelleTete)){
+        nouvelleTete->previous = NULL;
+    }
+    return nouvelleTete ;
 }
 
+ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, unsigned int ID) {
+    if (listeInsectes == NULL) {
+        // Liste vide
+        return NULL;
+    }
 
-// ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, int ID){
+    ListeInsectes current = listeInsectes;
+    ListeInsectes previous = NULL;
 
-//     while(listeInsectes->id != ID){
-//         if(listeInsectes->next == NULL){
-//             return listeInsectes;
-//         }
+    while (current != NULL && current->id != ID) {
+        previous = current;
+        current = current->next;
+    }
 
-//         listeInsectes = listeInsectes->next;
-//     }   
-// }
+    if (current == NULL) {
+        // ID non trouvé
+        return listeInsectes;
+    }
+
+    // Vérification pour s'assurer que l'élément n'a pas déjà été libéré
+    if (current->next != NULL) {
+        current->next->previous = previous;
+    }
+    if (previous != NULL) {
+        previous->next = current->next;
+    } else {
+        // Si 'current' est le premier élément
+        listeInsectes = current->next;
+    }
+
+    free(current);
+    return listeInsectes;
+}
 
 ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche){
     if(ruche->reserveMiel > 0 && ruche->reserveEau > 0 && listeInsectes->type == TYPE_OUVRIERE){
@@ -402,31 +446,77 @@ ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche){
     return listeInsectes;
 }
 
-ListeInsectes actionReine(ListeInsectes listeInsectes, Saisons saison){
-    
-    if(listeInsectes->type == TYPE_REINE){
-        printf("Reine\n");
-        if(saison == PRINTEMPS || saison == ETE){
-            
-            int i;
-            listeInsectes->data.reine.ponteJournaliere = true;
-            for(i=0; i<PONTE_OUVRIERE_JOUR; i++){
-                
-                listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, AUCUN, OEUF, 0, SANTE_MAX, false);
+ListeInsectes pop_specific_type(ListeInsectes liste, TypeInsecte type){
+    ListeInsectes insecteActuel = liste;
+    ListeInsectes prev = NULL;
+    while(insecteActuel != NULL){
+        if(insecteActuel->type == type){
+            if(prev == NULL){
+                liste->data.ouvriere.cohesion = 0; //Si le nombre d'abeille est trop grand, on supprime les abeilles en trop en mettant la cohesion a 0 
+                liste = pop_front_list(liste);
+                insecteActuel = liste;
+                break;
             }
-            for(i=0; i<PONTE_FAUX_BOURDON_JOUR; i++){
-                listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_FAUX_BOURDON, AUCUN, OEUF, 0, SANTE_MAX, false);
+            else{
+                prev->next = insecteActuel->next;
+                free(insecteActuel);
+                insecteActuel = prev->next;
+                break;
             }
         }
         else{
-            listeInsectes->data.reine.ponteJournaliere = false;
-        } 
+            prev = insecteActuel;
+            insecteActuel = insecteActuel->next;
+        }
     }
+    return liste;
+}
 
+ListeInsectes nombreMaxAbeille(ListeInsectes listeInsectes) {
+    while(list_length_type(listeInsectes, TYPE_OUVRIERE) > NOMBRE_MAX_OUVRIERES) {
+        //printf("Nombre d'ouvrieres trop grand\n");
+        listeInsectes = pop_specific_type(listeInsectes, TYPE_OUVRIERE);
+    }
+    while(list_length_type(listeInsectes, TYPE_FAUX_BOURDON) > NOMBRE_MAX_FAUX_BOURDONS) {
+        listeInsectes = pop_specific_type(listeInsectes, TYPE_FAUX_BOURDON);
+    }
     return listeInsectes;
 }
 
-RuchePtr evenementJouraniler(RuchePtr ruche){
+
+
+ListeInsectes competenceMaxAbeille(ListeInsectes listeInsectes){
+    if(listeInsectes->type == TYPE_OUVRIERE || listeInsectes->type == TYPE_FAUX_BOURDON){
+        if(listeInsectes->data.ouvriere.cohesion > COHESION_MAX){
+            listeInsectes->data.ouvriere.cohesion = COHESION_MAX;
+        }
+        if(listeInsectes->data.ouvriere.efficacite > EFFICACITE_MAX){
+            listeInsectes->data.ouvriere.efficacite = EFFICACITE_MAX;
+        }
+        // if(listeInsectes->data.ouvriere.experience > EXPERIENCE_MAX){
+        //     listeInsectes->data.ouvriere.experience = EXPERIENCE_MAX;
+        // }
+    }
+    return listeInsectes;
+}
+
+RuchePtr capaciteMaxRuche(RuchePtr ruche){
+    if(ruche->reserveMiel > CAPACITE_MAX_MIEL_g){
+        ruche->reserveMiel = CAPACITE_MAX_MIEL_g;
+    }
+    if(ruche->reserveEau > CAPACITE_MAX_EAU_ML){
+        ruche->reserveEau = CAPACITE_MAX_EAU_ML;
+    }
+    if(ruche->reservePollen > CAPACITE_MAX_POLLEN_G){
+        ruche->reservePollen = CAPACITE_MAX_POLLEN_G;
+    }
+    if(ruche->reserveGeleeRoyale > CAPACITE_MAX_GELEE_ROYALE_G){
+        ruche->reserveGeleeRoyale = CAPACITE_MAX_GELEE_ROYALE_G;
+    }
+    return ruche;
+}
+
+RuchePtr evenementJouranilerRuche(RuchePtr ruche){
     ruche->salete += 15;
     ruche->sante -= 30;
     ruche->reservePollen -= 50;
@@ -524,7 +614,7 @@ ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche)
                 break;*/
             case BUTINEUSE:
                 while (listeInsectes != NULL && listeInsectes->data.ouvriere.role == BUTINEUSE) {
-                    if (listeInsectes->data.ouvriere.efficacite > 0 && ruche->reservePollen != CAPACITE_MAX_POLLEN_CELLULE_G) {
+                    if (listeInsectes->data.ouvriere.efficacite > 0 && ruche->reservePollen != CAPACITE_MAX_POLLEN_G) {
                         ruche->reservePollen += 30;
                         listeInsectes->data.ouvriere.efficacite -= 1; 
                     }
@@ -539,9 +629,41 @@ ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche)
     return listeInsectes;
 }
 
+
+
+ListeInsectes actionReine(ListeInsectes listeInsectes, bool reine_Va_Pondre){
+    if(reine_Va_Pondre == true){
+        //printf("Reine\n");
+        int i;
+        for(i=0; i<PONTE_OUVRIERE_JOUR; i++){
+            listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, AUCUN, OEUF, 0, SANTE_MAX, false);
+        }
+        for(i=0; i<PONTE_FAUX_BOURDON_JOUR; i++){
+            listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_FAUX_BOURDON, AUCUN, OEUF, 0, SANTE_MAX, false);
+        }
+    }
+    return listeInsectes;
+}
+
+bool reineVaPondre(Saisons saison, ListeInsectes listeInsectes){
+    if(listeInsectes->type == TYPE_REINE){
+        //printf("C'est la reine Reine \n");
+        if(saison == PRINTEMPS || saison == ETE){  
+            listeInsectes->data.reine.ponteJournaliere = true;
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    else{
+        return false;
+    }
+
+}
 ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsigned int *jourNumero)
 {
-    ListeInsectes insecteActuel = listeInsectes;
+        //ListeInsectes prev = NULL;
     if(is_empty_list(listeInsectes)){
         return new_list();
     }
@@ -549,45 +671,52 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
 
         Saisons saison = cycleSaison(jourNumero); 
         ruche->temperature = generationJouraliereTemperature(saison);
-        ruche = evenementJouraniler(ruche);
-        ListeInsectes prev = NULL;
+        ruche = evenementJouranilerRuche(ruche);
 
         printf("_______________________________________________________________________________________________________\n\n");
-        print_list(listeInsectes);
+        //print_list(listeInsectes);
         printf("Jour numéro: %u\n", *jourNumero);
         printf("Saison: %s\n", SaisonsStrings[saison]);
         printf("Jour numéro: %u\n",*jourNumero);
         printf("Temperature: %f\n", ruche->temperature);
         printf("Taille de la liste: %u\n", list_length(listeInsectes));
-        printf("Le nombre de naissances: %u\n", list_length(listeInsectes));// à ajuster
-        printf("Le nombre de morts: %u\n", list_length(listeInsectes));// à ajuster
+        // printf("Le nombre de naissances: %u\n", list_length(listeInsectes));// à ajuster
+        // printf("Le nombre de morts: %u\n", list_length(listeInsectes));// à ajuster
         printf("_______________________________________________________________________________________________________\n");
-
-
+        
+        ListeInsectes insecteActuel = listeInsectes;
+        ListeInsectes prev = NULL;
+        bool reine_Va_Pondre = false;
+        
         while(insecteActuel != NULL)
         {
+            
             insecteActuel = cycleCroissance(insecteActuel);
             insecteActuel = cycledeFaim(insecteActuel, ruche);
-            insecteActuel = actionOuvriere(insecteActuel, ruche);
+
+            if (cycledeMort(insecteActuel))
+            {
+            listeInsectes = Kill_Abeille(listeInsectes, insecteActuel->id);
+            }
+            
+            
+            reine_Va_Pondre = reineVaPondre(saison, insecteActuel);
+            //printf("reine_Va_Pondre: %s\n", reine_Va_Pondre ? "Oui" : "Non");
             insecteActuel = insecteActuel->next;
         }
-        
-        
-
-        //     //insecteActuel = actionReine(listeInsectes, saison); 
-            
-        //     // insecteActuel= actionFauxBourdon(insecteActuel, saison);
-
-        //     //insecteActuel = cycledeMort(insecteActuel, saison);
-
+        listeInsectes = nombreMaxAbeille(listeInsectes);
+        listeInsectes = actionReine(listeInsectes, reine_Va_Pondre);
         
         return listeInsectes;
     }
             
 }
 
+
+
 //initialisation de la ruche
-RuchePtr initialisationRuche(){
+RuchePtr initialisationRuche()
+{
     RuchePtr ruche = malloc(sizeof(Ruche));
     if(ruche == NULL){
         perror("Erreur allocation mémoire\n");
