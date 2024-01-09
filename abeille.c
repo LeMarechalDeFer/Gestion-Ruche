@@ -698,8 +698,6 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
             {
             listeInsectes = Kill_Abeille(listeInsectes, insecteActuel->id);
             }
-            
-            
             reine_Va_Pondre = reineVaPondre(saison, insecteActuel);
             //printf("reine_Va_Pondre: %s\n", reine_Va_Pondre ? "Oui" : "Non");
             insecteActuel = insecteActuel->next;
