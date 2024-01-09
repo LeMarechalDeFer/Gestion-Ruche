@@ -56,7 +56,6 @@
 
 #define SANTE_RUCHE_MAX 500
 #define SANTE_RUCHE_MIN 0 
-
 typedef enum Saisons {
     PRINTEMPS,
     ETE,
@@ -118,7 +117,8 @@ typedef enum TypeInsecte{
 
 typedef struct Reine {
     bool ponteJournaliere;  
-    bool emmet_feromones; 
+    bool emmet_feromones;
+    int spermatheque; // 20 de base 
      
 } Reine;
 
@@ -175,9 +175,10 @@ ListeInsectes clear_list(ListeInsectes listeInsectes);
 ListeInsectes cycleCroissance(ListeInsectes listeInsectes);
 Saisons cycleSaison(unsigned int *jourNumero);
 
+ListeInsectes actionFauxBourdon(ListeInsectes listeInsectes ,unsigned int spermatheque);
 ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche);
 ListeInsectes actionReine(ListeInsectes listeInsectes, Saisons saison);
-bool cycledeMort(ListeInsectes insecte);
+bool cycledeMort(ListeInsectes insecte,Saisons saisons);
 ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche);
 
 RuchePtr initialisationRuche();

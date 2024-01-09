@@ -106,7 +106,10 @@ ListeInsectes GENERATION_push_front_list(ListeInsectes listeInsectes,
     switch(type){
         case TYPE_REINE:
             nouvelInsecte->data.reine.ponteJournaliere = true; 
-            nouvelInsecte->data.reine.emmet_feromones = true; 
+            nouvelInsecte->data.reine.emmet_feromones = true;
+            
+            
+            
             break;
         case TYPE_OUVRIERE:
             nouvelInsecte->data.ouvriere.cohesion = COHESION_MAX; 
@@ -151,7 +154,12 @@ ListeInsectes initialisationEssaim(ListeInsectes listeInsectes, unsigned int nbA
     unsigned int nbFauxBourdon = (nbAbeilles * 3) / 100; // 3%
 
     listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_REINE, AUCUN, ADULTE, 8, SANTE_MAX, false);
-    
+    for(i = 0; i < nbLarves; i++) {
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_FAUX_BOURDON, AUCUN, ADULTE, 0, SANTE_MAX, false);
+    }
+    for(i = 0; i < nbLarves; i++) {
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_FAUX_BOURDON, AUCUN, ADULTE, 0, SANTE_MAX, false);
+    }
     for(i = 0; i < nbLarves; i++) {
         listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, AUCUN, LARVE, 0, SANTE_MAX, false);
     }
@@ -289,60 +297,30 @@ float generationJouraliereTemperature(Saisons SaisonActuelle) {
 
 
 // A TESTER !!
-bool cycledeMort(ListeInsectes insecte)
+bool cycledeMort(ListeInsectes insecte,Saisons saisons)
 {
 
-    if (insecte == NULL) {
-        return false;
-    }
-
-    if (insecte->type == TYPE_OUVRIERE && insecte->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J) {
-        return true;
-    }
-    
-    if (insecte->type == TYPE_REINE && insecte->age >=30) { //DUREE_VIE_MAX_REINE_J) {
-        return true;
-    }
-    // Ajoutez ici d'autres conditions pour d'autres types d'insectes
-
-    return false;
+    switch (saisons) {
+                case ETE:
+                    if (insecte->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J) {
+                        return true;
+                    }
+                    break;
+                case PRINTEMPS:
+                    if (insecte->age >= DUREE_VIE_MAX_OUVRIERE_HIVER_J) {
+                        return true;
+                    }
+                    break;
+                // Ajouter des cas pour les autres saisons si nécessaire
+                default:
+                    // Logique pour les autres saisons si nécessaire
+                    break;
+            }
+            return false;
 }
-/*
-     if (listeActuelle->type == TYPE_OUVRIERE)
-        {
-            if(listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J){
-                listeInsectes = Kill_Abeille( listeInsectes,  listeActuelle->id);
-            }
-        }
-        if (listeActuelle->type == TYPE_REINE)
-        {
-            if(listeInsectes->age >= 30){
-                listeInsectes = Kill_Abeille( listeInsectes,  listeActuelle->id);
-            }
-        }
+    
 
-    if (listeInsectes == NULL) {
-        // La liste est vide, rien à faire
-        return listeInsectes;
-    }
-    if(listeInsectes->type == TYPE_REINE){
-        if(listeInsectes->age >= DUREE_VIE_MAX_REINE_J){
-            listeInsectes = Kill_Abeille( listeInsectes,  listeInsectes->id);
-        }
-    }
-    if(listeInsectes->type == TYPE_OUVRIERE){
-        if(listeInsectes->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J )
-        {
-            listeInsectes = Kill_Abeille( listeInsectes,  listeInsectes->id);
-        }
-    }
-    if(listeInsectes->type == TYPE_FAUX_BOURDON){
-        if(listeInsectes->age >= DUREE_VIE_MAX_FAUX_BOURDON_J){
-            listeInsectes = Kill_Abeille( listeInsectes,  listeInsectes->id);
-        }
-    }
-    return listeInsectes;
-}*/
+
 
 ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, unsigned int ID) {
     if (listeInsectes == NULL) {
@@ -378,19 +356,6 @@ ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, unsigned int ID) {
     return listeInsectes;
 }
 
-
-
-
-// ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, int ID){
-
-//     while(listeInsectes->id != ID){
-//         if(listeInsectes->next == NULL){
-//             return listeInsectes;
-//         }
-
-//         listeInsectes = listeInsectes->next;
-//     }   
-// }
 
 ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche){
     if(ruche->reserveMiel > 0 && ruche->reserveEau > 0 && listeInsectes->type == TYPE_OUVRIERE){
@@ -448,8 +413,26 @@ RuchePtr evenementJouraniler(RuchePtr ruche){
     ruche->sante -= 1;
 
     return ruche;
-}
+}/**
+ListeInsectes actionFauxBourdon(ListeInsectes listeInsectes ,unsigned int* spermatheque)
+{ 
+    if (listeInsectes->type == TYPE_FAUX_BOURDON)
+    {   
+        if (listeInsectes->data.reine.spermatheque > 0  )
+        {
+            printf("fecondation spermatheque before =%d par bourdon id =%d\n",spermatheque,listeInsectes->id);
 
+            *spermatheque = *spermatheque - 1;
+            listeInsectes->data.FauxBourdon.enQueteReine = false; 
+            printf("fecondation spermatheque =%d par bourdon id =%d\n",spermatheque,listeInsectes->id);
+            listeInsectes->data.FauxBourdon.feromones = false;
+            listeInsectes->data.reine.spermatheque = spermatheque;
+            printf("fecondation spermatheque after =%d par bourdon id =%d\n",spermatheque,listeInsectes->id);
+        }
+        
+    }
+    return listeInsectes;
+}*/
 
 ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche)
 { 
@@ -496,59 +479,51 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
         return new_list();
     }
     else{
-        Saisons saison = cycleSaison(jourNumero); 
-        ruche->temperature = generationJouraliereTemperature(saison);
+        Saisons saisons = cycleSaison(jourNumero); 
+        ruche->temperature = generationJouraliereTemperature(saisons);
         ruche = evenementJouraniler(ruche);
 
         printf("_______________________________________________________________________________________________________\n\n");
         print_list(listeInsectes);
         printf("Jour numéro: %u\n", *jourNumero);
-        printf("Saison: %s\n", SaisonsStrings[saison]);
+        printf("Saison: %s\n", SaisonsStrings[saisons]);
         printf("Jour numéro: %u\n",*jourNumero);
         printf("Temperature: %f\n", ruche->temperature);
         printf("Taille de la liste: %u\n", list_length(listeInsectes));
         printf("Le nombre de naissances: %u\n", list_length(listeInsectes));// à ajuster
         printf("Le nombre de morts: %u\n", list_length(listeInsectes));// à ajuster
+        listeInsectes->data.reine.spermatheque =20;
+        printf("Spermatheque remplis à :%d/20\n",listeInsectes->data.reine.spermatheque);
+        printf("Spermatheque remplis à :%d/20\n",listeInsectes->data.reine.spermatheque);
         printf("_______________________________________________________________________________________________________\n");
 
         
         ListeInsectes listeActuelle = listeInsectes;
+        listeActuelle->age=listeInsectes->age;
         ListeInsectes next;
         while(listeActuelle  != NULL)
         {
         next = listeActuelle->next; // Sauvegarde du pointeur suivant avant de potentiellement supprimer 'listeActuelle'
-
+        printf("--------------------------------------------%d\n",listeActuelle->age);
         listeActuelle = cycleCroissance(listeActuelle);
         listeActuelle = cycledeFaim(listeActuelle, ruche);
-        //insecteActuel = actionReine(listeInsectes, saison); 
+        //insecteActuel = actionReine(listeInsectes, saisons); 
             
-        //     // insecteActuel= actionFauxBourdon(insecteActuel, saison);
+        //listeActuelle = actionFauxBourdon(listeActuelle,listeActuelle->data.reine.spermatheque);
         //     // insecteActuel = actionOuvriere(insecteActuel, ruche);
        
-        /*if (listeActuelle->type == TYPE_OUVRIERE)
-        {
-            if(listeActuelle->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J){
-                listeInsectes = Kill_Abeille( listeInsectes,  listeActuelle->id);
-            }
-        }
-        if (listeActuelle->type == TYPE_REINE)
-        {
-            if(listeActuelle->age >= 30){
-                listeInsectes = Kill_Abeille( listeInsectes,  listeActuelle->id);
-            }
-        }*/
-        if (cycledeMort(listeActuelle))
+        
+        if (cycledeMort(listeActuelle,saisons))
         {
             listeInsectes = Kill_Abeille(listeInsectes, listeActuelle->id);
         }
 
-        //listeActuelle = cycledeMort(listeInsectes,listeActuelle, saison);
+        //listeActuelle = cycledeMort(listeInsectes,listeActuelle, saisons);
 
 
         listeActuelle = next; // Utiliser le pointeur sauvegardé
         
         }
-        
         
         return listeInsectes;
     }
