@@ -121,7 +121,7 @@ typedef enum TypeInsecte{
 
 typedef struct Reine {
     bool ponteJournaliere;  
-    bool emmet_feromones; 
+    int spermatheque;
      
 } Reine;
 

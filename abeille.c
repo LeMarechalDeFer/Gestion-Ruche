@@ -67,9 +67,8 @@ void print_list(ListeInsectes listeInsectes){
                     listeInsectes->faim ? "Oui" : "Non");
             switch(listeInsectes->type) {
                 case TYPE_REINE:
-                    printf("Type: Reine, Ponte Journaliere: %s, Emet Feromones: %s\n",
-                           listeInsectes->data.reine.ponteJournaliere ? "Oui" : "Non",
-                           listeInsectes->data.reine.emmet_feromones ? "Oui" : "Non");
+                    printf("Type: Reine, Ponte Journaliere: %s\n",
+                           listeInsectes->data.reine.ponteJournaliere ? "Oui" : "Non");
                     break;
                 case TYPE_OUVRIERE:
                     printf("Type: Ouvriere, Cohésion: %u, Efficacite: %u, Experience: %u, Role: %s\n",
@@ -120,7 +119,6 @@ ListeInsectes GENERATION_push_front_list(ListeInsectes listeInsectes,
     switch(type){
         case TYPE_REINE:
             nouvelInsecte->data.reine.ponteJournaliere = true; 
-            nouvelInsecte->data.reine.emmet_feromones = true; 
             break;
         case TYPE_OUVRIERE:
             nouvelInsecte->data.ouvriere.cohesion = COHESION_MAX; 
@@ -254,7 +252,6 @@ ListeInsectes cycleCroissance(ListeInsectes listeInsectes){
 }
 
 
-
 // On assume un depart au debut printemps pour un maximum de ponte et de reserve de nourriture
 Saisons cycleSaison(unsigned int *jourNumero){
 
@@ -277,8 +274,6 @@ Saisons cycleSaison(unsigned int *jourNumero){
 }
 
 float generationJouraliereTemperature(Saisons SaisonActuelle) {
-
-    //srand(time(NULL));
     
     float temperature;
     
@@ -519,12 +514,14 @@ ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche)
                 }
             break;
             case NETTOYEUSE:
+                printf("UwU");
                 while (listeInsectes != NULL && listeInsectes->data.ouvriere.role == NETTOYEUSE) 
                 {
                     if (listeInsectes->data.ouvriere.efficacite > 0) 
                     {
                         listeInsectes->data.ouvriere.efficacite -= 4;
                         ruche->salete -= 5;
+                        //printf("Nettoyage en cours. Saleté restante : %f\n", ruche->salete);
                     }
                     // Passage à l'abeille suivante
                     listeInsectes = listeInsectes->next;
@@ -618,9 +615,50 @@ bool reineVaPondre(Saisons saison, ListeInsectes listeInsectes){
     }
 
 }
+
+bool parcoursListeTrouverReine(ListeInsectes listeInsectes){
+    ListeInsectes insecteActuel = listeInsectes;
+    while(insecteActuel != NULL){
+        if(insecteActuel->type == TYPE_REINE){
+            if(insecteActuel->data.reine.spermatheque <20){
+                insecteActuel->data.reine.spermatheque += 1;
+                return true;
+            } 
+            else{
+                return false;
+            }
+            
+        }
+        else{
+            insecteActuel = insecteActuel->next;
+        }
+    }
+    return false;
+}
+
+
+
+ListeInsectes actionFauxBourdon(ListeInsectes listeInsectes, Saisons saison){
+    if(listeInsectes->type == TYPE_FAUX_BOURDON){
+        if(saison == PRINTEMPS || saison == ETE){
+            listeInsectes->data.FauxBourdon.enQueteReine = true;
+            if(parcoursListeTrouverReine(listeInsectes) == true){
+                printf("Faux Bourdon a trouvé la reine\n");
+                listeInsectes = Kill_Abeille(listeInsectes, listeInsectes->id);
+            }
+        }
+        else{
+            listeInsectes->data.FauxBourdon.enQueteReine = false;
+        }
+    }
+    return listeInsectes;
+}
+
+
+
 ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsigned int *jourNumero)
 {
-        //ListeInsectes prev = NULL;
+    //ListeInsectes prev = NULL;
     if(is_empty_list(listeInsectes)){
         return new_list();
     }
@@ -651,6 +689,7 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
             insecteActuel = cycleCroissance(insecteActuel);
             insecteActuel = cycledeFaim(insecteActuel, ruche);
             insecteActuel = actionOuvriere(insecteActuel, ruche);
+            insecteActuel = actionFauxBourdon(insecteActuel, saison);
             if (cycledeMort(insecteActuel))
             {
             listeInsectes = Kill_Abeille(listeInsectes, insecteActuel->id);
