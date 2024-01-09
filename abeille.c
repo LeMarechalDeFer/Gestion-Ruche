@@ -602,7 +602,7 @@ ListeInsectes actionReine(ListeInsectes listeInsectes, bool reine_Va_Pondre){
 bool reineVaPondre(Saisons saison, ListeInsectes listeInsectes){
     if(listeInsectes->type == TYPE_REINE){
         //printf("C'est la reine Reine \n");
-        if(saison == PRINTEMPS || saison == ETE){  
+        if((saison == PRINTEMPS || saison == ETE)&& listeInsectes->data.reine.spermatheque > 0){  
             listeInsectes->data.reine.ponteJournaliere = true;
             return true;
         }
@@ -638,20 +638,19 @@ bool parcoursListeTrouverReine(ListeInsectes listeInsectes){
 
 
 
-ListeInsectes actionFauxBourdon(ListeInsectes listeInsectes, Saisons saison){
-    if(listeInsectes->type == TYPE_FAUX_BOURDON){
+ListeInsectes actionFauxBourdon(ListeInsectes listeInsectes,ListeInsectes listeActuelle, Saisons saison){
+    if(listeActuelle->type == TYPE_FAUX_BOURDON){
         if(saison == PRINTEMPS || saison == ETE){
-            listeInsectes->data.FauxBourdon.enQueteReine = true;
-            if(parcoursListeTrouverReine(listeInsectes) == true){
-                printf("Faux Bourdon a trouvé la reine\n");
-                listeInsectes = Kill_Abeille(listeInsectes, listeInsectes->id);
+            listeActuelle->data.FauxBourdon.enQueteReine = true;
+            if(parcoursListeTrouverReine(listeActuelle) == true){
+                //printf("Faux Bourdon a trouvé la reine\n");                
             }
         }
         else{
-            listeInsectes->data.FauxBourdon.enQueteReine = false;
+            listeActuelle->data.FauxBourdon.enQueteReine = false;
         }
     }
-    return listeInsectes;
+    return listeActuelle;
 }
 
 
@@ -689,7 +688,7 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
             insecteActuel = cycleCroissance(insecteActuel);
             insecteActuel = cycledeFaim(insecteActuel, ruche);
             insecteActuel = actionOuvriere(insecteActuel, ruche);
-            insecteActuel = actionFauxBourdon(insecteActuel, saison);
+            insecteActuel = actionFauxBourdon(listeInsectes,insecteActuel, saison);
             if (cycledeMort(insecteActuel))
             {
             listeInsectes = Kill_Abeille(listeInsectes, insecteActuel->id);
