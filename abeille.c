@@ -492,115 +492,71 @@ RuchePtr evenementJouranilerRuche(RuchePtr ruche){
     return ruche;
 }
 
-
-ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche)
-{
-    switch(listeInsectes->data.ouvriere.role)
-    {
-            case AUCUN:
-                break;
-           case NOURRICE:
-            
-                while (listeInsectes != NULL && listeInsectes->data.ouvriere.role == NOURRICE) {
-                    if ((listeInsectes->data.ouvriere.efficacite > 0 && listeInsectes->cycleCroissanceAbeilles == LARVE) ||
-                        (listeInsectes->data.ouvriere.efficacite > 0 && listeInsectes->cycleCroissanceAbeilles == OEUF) ||
-                        (listeInsectes->data.ouvriere.efficacite > 0 && listeInsectes->cycleCroissanceAbeilles == PUPAISON)) {
-                            if (listeInsectes->faim == true)
-                            {
-                                listeInsectes->faim = false;
-                            }
-                    }
-                            if (listeInsectes->data.ouvriere.role == NOURRICE)
-                            {
-                                listeInsectes->data.ouvriere.efficacite -= 5;
-                            }
-                    if (listeInsectes->next != NULL) {
-                        listeInsectes = listeInsectes->next;
-                    } else {
-                        break;
-                    }
-                }
-            break;
+ListeInsectes actionOuvriere(ListeInsectes listeInsectes, RuchePtr ruche){
+    if(listeInsectes->type == TYPE_OUVRIERE){
+        switch(listeInsectes->data.ouvriere.role){
             case NETTOYEUSE:
-                while (listeInsectes != NULL && listeInsectes->data.ouvriere.role == NETTOYEUSE) 
-                {
-                    if (listeInsectes->data.ouvriere.efficacite > 0) 
-                    {
-                        listeInsectes->data.ouvriere.efficacite -= 4;
-                        ruche->salete -= 5;
-                    }
-                    listeInsectes = listeInsectes->next;
-                }
-            break;
-            case MAGASINIERE:    
-                while (listeInsectes != NULL && listeInsectes->data.ouvriere.role == MAGASINIERE) 
-                {
-                    if (listeInsectes->data.ouvriere.efficacite > 0 && ruche->reserveMiel != CAPACITE_MAX_MIEL_g) 
-                    {
-                        listeInsectes->data.ouvriere.efficacite -= 1;
-                        ruche->reserveMiel += 30;
-                    }
-                    if (listeInsectes->next != NULL && listeInsectes->next->data.ouvriere.role == MAGASINIERE) {
-                        listeInsectes = listeInsectes->next;
-                    } else {
-                        break;
-                    }
+                if(ruche->salete > 0){
+                    ruche->salete -= 1;
+                    printf("Nettoyeuse a fait son travail\n");
                 }
                 break;
-            case CIRIERE:    
-                while (listeInsectes != NULL)
-                {
-                    if (listeInsectes->data.ouvriere.efficacite > 0 && ruche->sante != SANTE_RUCHE_MAX)
-                    {
-                        listeInsectes->data.ouvriere.efficacite -= 1;
-                        ruche->sante += 1;                        
-                    }
-                    if (listeInsectes->next != NULL && listeInsectes->next->data.ouvriere.role == CIRIERE) {
-                        listeInsectes = listeInsectes->next;
-                    } else {
-                        break;
-                    }
-                }
-                break;
-            case VENTILEUSE:
-            while (listeInsectes != NULL && listeInsectes->data.ouvriere.role == VENTILEUSE)
-              {
-                    if (listeInsectes->data.ouvriere.efficacite > 0 && ruche ->temperature > 35)
-                    {
-                            listeInsectes->data.ouvriere.efficacite -= 1;
-                            ruche->temperature = (rand()% 45)+ 34;
-                    }
-                    if (listeInsectes->next != NULL && listeInsectes->next->data.ouvriere.role == VENTILEUSE) {
-                        listeInsectes = listeInsectes->next;
-                    } else {
-                        break;
-                    }
-              }
-            break;
-            case GARDIENNE:
-              /*  while (listeInsectes->data.ouvriere.efficacite > 0 && (listeInsectes->type == TYPE_OURSE || listeInsectes->type == TYPE_GUEPE)  )
-                {
-                   listeInsectes->data.ouvriere.efficacite -= 10;
-                }
+            case NOURRICE:
                 
-                break;*/
-            case BUTINEUSE:
-                while (listeInsectes != NULL && listeInsectes->data.ouvriere.role == BUTINEUSE) {
-                    if (listeInsectes->data.ouvriere.efficacite > 0 && ruche->reservePollen != CAPACITE_MAX_POLLEN_G) {
-                        ruche->reservePollen += 30;
-                        listeInsectes->data.ouvriere.efficacite -= 1; 
-                    }
-                    if (listeInsectes->next != NULL && listeInsectes->next->data.ouvriere.role == BUTINEUSE) {
-                        listeInsectes = listeInsectes->next;
-                    } else {
-                        break;
-                    }
+                break;
+            case MAGASINIERE:
+                if(ruche->reservePollen > 0){
+                    ruche->reservePollen -= 5;
+                    ruche->reserveMiel += 8;
+                    ruche->reserveGeleeRoyale += 1;
+                    printf("Magasiniere a fait son travail\n");
+                }
+                else{
+                    printf("Pas assez de pollen\n");
                 }
                 break;
+            case CIRIERE:
+                if(ruche->sante < SANTE_RUCHE_MAX){
+                    ruche->sante += 1;
+                    printf("Ciriere a fait son travail\n");
+                }
+                else{
+                    printf("Sante ruche max\n");
+                }
+                break;
+
+            case VENTILEUSE:
+                if(ruche->temperature > TEMPERATURE_IDEAL){
+                    ruche->temperature -= 1;
+                    printf("Ventileuse a fait son travail\n");
+                }
+                if(ruche->temperature < TEMPERATURE_IDEAL){
+                    ruche->temperature += 1;
+                    printf("Ventileuse a fait son travail\n");
+                }
+                else{
+                    printf("Temperature idéale\n");
+                }
+                break;
+            case GARDIENNE:
+
+                break;
+                
+            case BUTINEUSE:
+                ruche->reservePollen += 5;
+                ruche->reserveEau += 5;
+                printf("Butineuse a fait son travail\n");
+
+                break;
+
+            default:
+                break;
+        }
+                
+            
     }
     return listeInsectes;
 }
-
 
 
 ListeInsectes actionReine(ListeInsectes listeInsectes, bool reine_Va_Pondre){
@@ -732,6 +688,7 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
         printf("Le nombre de naissances: %u\n", nombreNaissance);
         printf("Le nombre de morts: %u\n", nombreMort);
         printf("Nourriture ruche: Miel: %u, Eau: %u, Pollen: %u, Gelee Royale: %u\n", ruche->reserveMiel, ruche->reserveEau, ruche->reservePollen, ruche->reserveGeleeRoyale);
+        printf("Statistiques ruche: Temperature: %f, Sante: %f, Salete: %f\n", ruche->temperature, ruche->sante, ruche->salete);
 
         printf("_______________________________________________________________________________________________________\n");
 
