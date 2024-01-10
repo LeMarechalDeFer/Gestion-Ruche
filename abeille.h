@@ -55,7 +55,7 @@
 #define TEMPERATURE_IDEAL 35 
 #define TEMPERATURE_MIN -30
 #define TEMPERATURE_MAX 37
-#define TEMPERATURE_VENTILATION 12
+#define TEMPERATURE_VENTILATION 0.5
 
 #define USURE_JOURNALIERE_RUCHE 50
 #define SANTE_RUCHE_MAX 500
@@ -218,7 +218,13 @@ ListeInsectes pop_front_list(ListeInsectes listeInsectes);
 bool reineVaPondre(Saisons saison, ListeInsectes listeInsectes);
 bool parcoursListeTrouverReine(ListeInsectes listeInsectes);
 ListeInsectes actionFauxBourdon(ListeInsectes listeInsectes, Saisons saison);
-void affichageTour(ListeInsectes listeInsectes, RuchePtr ruche, unsigned int *jourNumero, unsigned int nombreNaissance, unsigned int nombreMort, Saisons saison);
+void affichageTour(ListeInsectes listeInsectes, 
+                    RuchePtr ruche, 
+                    unsigned int *jourNumero, 
+                    unsigned int nombreNaissance, 
+                    unsigned int nombreMort, 
+                    Saisons saison,
+                    float temperatureJournee);
 unsigned int nombreMortJ(unsigned int tailleListe, unsigned int tailleListeAfter);
 unsigned int nombreNaissanceJ(bool reine_Va_Pondre);
 bool conditionMortRuche(RuchePtr ruche, ListeInsectes listeInsectes);

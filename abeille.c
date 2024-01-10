@@ -565,12 +565,19 @@ ListeInsectes actionOuvriere(ListeInsectes listeInsectes, RuchePtr ruche){
 
             case VENTILEUSE: 
                 if(ruche->temperature > TEMPERATURE_IDEAL){
-                    ruche->temperature -= TEMPERATURE_VENTILATION ;
                     printf("Ventileuse a fait son travail\n");
+                    printf("Avant travail ventileuse: %f\n", ruche->temperature);
+                    printf("TZS\n");
+                    ruche->temperature -= TEMPERATURE_VENTILATION ;
+                    printf("Apres travail ventileuse: %f\n", ruche->temperature);
+                    
                 }
                 if(ruche->temperature < TEMPERATURE_IDEAL){
-                    ruche->temperature += TEMPERATURE_VENTILATION ;
                     printf("Ventileuse a fait son travail\n");
+                    printf("Avant travail ventileuse: %f\n", ruche->temperature);
+                    printf("TZS\n");
+                    ruche->temperature += TEMPERATURE_VENTILATION ;
+                    printf("Apres travail ventileuse: %f\n", ruche->temperature);
                 }
                 else{
                     printf("Temperature idéale\n");
@@ -707,7 +714,8 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
         unsigned int tailleListe = list_length(listeInsectes);  
 
         Saisons saison = cycleSaison(jourNumero); 
-        ruche->temperature = generationJouraliereTemperature(saison);
+        float temperatureJournee = generationJouraliereTemperature(saison);
+        ruche->temperature = temperatureJournee;
         ruche = evenementJouranilerRuche(ruche);
         
         ListeInsectes insecteActuel = listeInsectes;
@@ -751,7 +759,7 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
 
         nombreNaissance = nombreNaissanceJ(reine_Va_Pondre);
         
-        affichageTour(listeInsectes, ruche, jourNumero, nombreNaissance, nombreMort, saison);
+        affichageTour(listeInsectes, ruche, jourNumero, nombreNaissance, nombreMort, saison, temperatureJournee);
 
         return listeInsectes;
     }
@@ -774,14 +782,20 @@ unsigned int nombreNaissanceJ(bool reine_Va_Pondre){
 
 
 
-void affichageTour(ListeInsectes listeInsectes, RuchePtr ruche, unsigned int *jourNumero, unsigned int nombreNaissance, unsigned int nombreMort, Saisons saison){
+void affichageTour(ListeInsectes listeInsectes, 
+                    RuchePtr ruche, 
+                    unsigned int *jourNumero, 
+                    unsigned int nombreNaissance, 
+                    unsigned int nombreMort, 
+                    Saisons saison,
+                    float temperatureJournee){
 
         printf("_______________________________________________________________________________________________________\n\n");
         print_list(listeInsectes);
         printf("Jour numéro: %u\n", *jourNumero);
         printf("Saison: %s\n", SaisonsStrings[saison]);
         printf("Jour numéro: %u\n",*jourNumero);
-        printf("Temperature: %f\n", ruche->temperature);
+        printf("Temperature: %f\n", temperatureJournee);
         printf("Taille de la liste: %u\n", list_length(listeInsectes));
         printf("Le nombre de naissances: %u\n", nombreNaissance);
         printf("Le nombre de morts: %u\n", nombreMort);
@@ -800,9 +814,9 @@ RuchePtr initialisationRuche()
         perror("Erreur allocation mémoire\n");
         exit(EXIT_FAILURE);
     }
-    ruche->temperature = 20;
+    ruche->temperature = TEMPERATURE_IDEAL;
     ruche->sante = SANTE_RUCHE_MAX;
-    ruche->salete = 15;
+    ruche->salete = SALETE_MIN;
     ruche->reserveMiel = 0;
     ruche->reserveEau = 0;
     ruche->reservePollen = 0;
