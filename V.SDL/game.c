@@ -5,12 +5,10 @@
     SDL_RENDERER_TARGETTEXTURE (rendu selon texture)
 
 */
-/* gcc main.c -o SDL -I/usr/include/SDL2 -I/usr/include/SDL2_image -I/usr/include/SDL2_ttf -L/usr/lib -lSDL2 -lSDL2_ima
-ge -lSDL2_ttf */
+/* gcc main.c -o SDL -lSDL2 -lSDL2_image -lSDL2_ttf */
 
 
 #include "SDL.h"
-
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
@@ -39,19 +37,19 @@ extern SDL_Texture* texture_background;
 #define NB_BEES 10
 
 void SDL_ExitWithError(const char *message);
-typedef struct Ruche {
+typedef struct Ruche_SDL {
     float W;    // Largeur
     float X;    // Postion X
     float Y;    // Position Y
     float Z;    // Hauteur
-} Ruche;
+} Ruche_SDL;
 
 typedef struct{
     const char* seasonName;
     const char* backgroundImagePath;
-}Saison;
+}Saison_SDL;
 
-Saison seasons[] = {
+Saison_SDL saisons_sdl[] = {
     {"Spring", "V.SDL/Assets/back_spring.bmp"},  // Assurez-vous que ce chemin est correct
     {"Summer", "V.SDL/Assets/back_autumn.bmp"},  // et que l'image existe bien ici
     {"Autumn", "V.SDL/Assets/back_summer.bmp"},
@@ -63,7 +61,7 @@ void load_bee_texture()
 {   for(int i = 1; i<= 4;i++)
     {
         char filePath[50];
-        snprintf(filePath, sizeof(filePath), "Assets/Position_%d.bmp", i );
+        snprintf(filePath, sizeof(filePath), "V.SDL/Assets/Position_%d.bmp", i );
 
         SDL_Surface* BEE_surface = SDL_LoadBMP(filePath);
         if (!BEE_surface) {
@@ -91,7 +89,7 @@ void change_saisons(int seasonIndex, SDL_Texture **texture_background) {
     }
 
     // Charge l'image correspondante dans la texture
-    SDL_Surface *tempSurface = SDL_LoadBMP(seasons[seasonIndex].backgroundImagePath);
+    SDL_Surface *tempSurface = SDL_LoadBMP(saisons_sdl[seasonIndex].backgroundImagePath);
     if (tempSurface == NULL) {
         printf("Could not load image: %s\n", SDL_GetError());
         return;
@@ -103,14 +101,14 @@ void change_saisons(int seasonIndex, SDL_Texture **texture_background) {
     if (*texture_background == NULL) {
         printf("Could not create texture: %s\n", SDL_GetError());
     } else {
-        printf("Season changed to: %s\n", seasons[seasonIndex].seasonName);
+        printf("Season changed to: %s\n", saisons_sdl[seasonIndex].seasonName);
     }
 }
 
 void Display(float elapsed_time)
 {
     // Charger la police et préparer le texte du timer
-    TTF_Font* font = TTF_OpenFont("Config/Roboto-BlackItalic.ttf", 24);
+    TTF_Font* font = TTF_OpenFont("V.SDL/Assets/Roboto-BlackItalic.ttf", 24);
     if (!font) {
         SDL_ExitWithError("Failed to load font");
     }
@@ -151,14 +149,15 @@ void Display(float elapsed_time)
     SDL_FreeSurface(Ruche_surface);
 
     SDL_Rect ruche_position;
+    ruche_position.x = 100;
+    ruche_position.y = 260;
     if (SDL_QueryTexture(Ruche_texture, NULL,NULL,&ruche_position.w, &ruche_position.h)!= 0)
     {
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         SDL_ExitWithError("Failed to load Hive texture");
     }
-    ruche_position.x = 20;
-    ruche_position.y = 240;
+   
 
     if(SDL_RenderCopy(renderer,Ruche_texture,NULL,&ruche_position))
     {
@@ -189,6 +188,9 @@ void Display(float elapsed_time)
     // Libération des ressources
     SDL_DestroyTexture(texture_Timer); // Libérer la texture du timer
     TTF_CloseFont(font); // Fermer la police
+
+
+
 }
 
 SDL_Window* initSDL()
