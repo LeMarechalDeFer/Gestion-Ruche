@@ -34,6 +34,15 @@
 #define TEMPS_PUPAISON_FAUX_BOURDON_J 12
 #define DUREE_VIE_MAX_FAUX_BOURDON_J 60
 
+#define AGE_NETTOYEUSE_J 15
+#define AGE_NOURRICE_J 18
+#define AGE_MAGASINIERE_J 23
+#define AGE_CIRIERE_J 25
+#define AGE_VENTILEUSE_J 28
+#define AGE_GARDIENNE_J 33
+#define AGE_BUTINEUSE_J 38
+
+
 #define SANTE_MAX 100 
 #define SANTE_MIN 0
 #define COHESION_MAX 100
@@ -44,16 +53,18 @@
 #define EFFICACITE_MIN 0
 #define EFFICACITER_PAR_DEFAUT 50
 
+// Les capacités sont arbitraires et peuvent être modifiées à votre gise !!! Des valeurs plus réalistes sont les bienvenues
+// Des valeurs plus faible peuvent être mise pour des tests de mort de la ruche
 
 #define CAPACITE_MAX_POLLEN_G 5000 
-#define CAPACITE_MAX_MIEL_g 10000 
+#define CAPACITE_MAX_MIEL_g 10000000 
 #define CAPACITE_MAX_GELEE_ROYALE_G 1000 
-#define CAPACITE_MAX_EAU_ML 10000 
+#define CAPACITE_MAX_EAU_ML 100000000 
 
 #define CAPACITE_INITIALE_POLLEN_G 1000
-#define CAPACITE_INITIALE_MIEL_g 1000
+#define CAPACITE_INITIALE_MIEL_g 10000000
 #define CAPACITE_INITIALE_GELEE_ROYALE_G 100
-#define CAPACITE_INITIALE_EAU_ML 1000
+#define CAPACITE_INITIALE_EAU_ML 10000000
 
 
 #define RECOLTE_POLLEN_J 100
@@ -75,12 +86,12 @@
 #define TEMPERATURE_MAX 37
 #define TEMPERATURE_VENTILATION 0.5
 
-#define USURE_JOURNALIERE_RUCHE 50
+#define USURE_JOURNALIERE_RUCHE 1
 #define SANTE_RUCHE_MAX 500
 #define SANTE_RUCHE_MIN 0 
 #define SANTE_RUCHE_REPARATION 1000
 
-#define SALETE_JOURNALIERE_RUCHE 50
+#define SALETE_JOURNALIERE_RUCHE 1
 #define SALETE_MAX 1000
 #define SALETE_MIN 0
 #define SALETE_NETTOYAGE 1000
@@ -207,13 +218,13 @@ ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche);
 
 
 //ListeInsectes cycledeMort(ListeInsectes insecteActuel, ListeInsectes listeInsectes);
-bool cycledeMort(ListeInsectes insecte);
+bool cycledeMort(ListeInsectes insecte, Saisons Saison);
 
 ListeInsectes actionReine(ListeInsectes listeInsectes, bool reine_Va_Pondre);
 
 ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche);
 
-
+void delay(int secondes) ;
 
 RuchePtr initialisationRuche();
 
@@ -244,7 +255,7 @@ void affichageTour(ListeInsectes listeInsectes,
 unsigned int nombreMortJ(unsigned int tailleListe, unsigned int tailleListeAfter);
 unsigned int nombreNaissanceJ(bool reine_Va_Pondre);
 bool conditionMortRuche(RuchePtr ruche, ListeInsectes listeInsectes);
-
+ListeInsectes attributionRoleOuvriere(ListeInsectes listeInsectes);
 /*
 - Cycle de vie : naissance croissance mort 
 - Cycle des saisons : Printemps Ete Automne Hiver
