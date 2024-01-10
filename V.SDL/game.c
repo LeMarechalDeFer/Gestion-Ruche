@@ -79,6 +79,7 @@ void load_bee_texture()
         //SDL_FreeTexture() ; 
     }
 }
+/*
 void change_saisons(int seasonIndex, SDL_Texture **texture_background) {
     // Assurez-vous que l'index de saison est valide
     seasonIndex = seasonIndex % 4; // 4 saisons
@@ -103,6 +104,40 @@ void change_saisons(int seasonIndex, SDL_Texture **texture_background) {
     } else {
         printf("Season changed to: %s\n", saisons_sdl[seasonIndex].seasonName);
     }
+}*/
+void change_de_saisons(int saisonIndex,SDL_Texture **texture_background)
+{
+
+    // Libère l'ancienne texture si elle existe
+    if (*texture_background != NULL) {
+        SDL_DestroyTexture(*texture_background);
+    }
+
+    // Charge l'image correspondante dans la texture
+    SDL_Surface *tempSurface = SDL_LoadBMP(saisons_sdl[saisonIndex].backgroundImagePath);
+    if (tempSurface == NULL) {
+        printf("Could not load image: %s\n", SDL_GetError());
+        return;
+    }
+
+    *texture_background = SDL_CreateTextureFromSurface(renderer, tempSurface);
+    SDL_FreeSurface(tempSurface);  // Libérer la surface temporaire après la création de la texture
+
+    if (*texture_background == NULL) {
+        printf("Could not create texture: %s\n", SDL_GetError());
+    } else {
+        printf("Season changed to: %s\n", saisons_sdl[saisonIndex].seasonName);
+    }
+
+
+
+
+
+
+
+
+   
+    
 }
 
 void Display(float elapsed_time)

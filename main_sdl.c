@@ -1,6 +1,7 @@
 #include "V.SDL/game.c"
 #include "abeille.h"
 
+
 int main()
 {
     srand(time(NULL));
@@ -15,7 +16,7 @@ int main()
     mesInsectes = initialisationEssaim(mesInsectes, 20);
     maRuche = initialisationRuche(maRuche);
 
-    
+    /*
     int NBR_DE_TOURS =45; //choisir le nombre de jours
     for(int i=0;i<NBR_DE_TOURS;i++){
         mesInsectes = tourDeSimulation(mesInsectes, maRuche, jourNumero);
@@ -25,12 +26,12 @@ int main()
         printf("_______________________________________________________________________________________________________\n");
         break;
         }
-    
+        delay(1000)
     }
     //print_list(mesInsectes);
     mesInsectes = clear_list(mesInsectes);  
     print_list(mesInsectes);
-    free(jourNumero);
+    free(jourNumero);*/
     // ///////////////////////////////////////////////////////////////////////////////////////////////////
     init_TTF();
     SDL_Window* window = initSDL();
@@ -66,6 +67,8 @@ int main()
 
     SDL_FreeSurface(defaultSurface); // Libérez la surface, elle n'est plus nécessaire
 
+        int NBR_DE_TOURS =100; //choisir le nombre de jours
+        int tours_execut =0;
     while (program_launched)
     {
         
@@ -96,15 +99,35 @@ int main()
         float Temp_écoulé_player = Differentiel_ticks_player/1000.0f; //pour que le joueur continue a soir ce qui ce passe 
         if (Temp_écoulé >= 4)
         {
-        change_saisons(seasonIndex , &texture_background); // Change la saison
+        //change_saisons(seasonIndex , &texture_background); // Change la saison
         seasonIndex++;
         Start_tick = SDL_GetTicks(); // Réinitialise le chronomètre pour le prochain intervalle
         }
+
         Display(Temp_écoulé_player);
-        
-        
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////
+        mesInsectes = tourDeSimulation(mesInsectes, maRuche, jourNumero);
+        if(mesInsectes  == NULL)
+        {
+        printf("Toute la colonie est morte\n");
+        printf("_______________________________________________________________________________________________________\n");
+        SDL_Delay(5);
+        }
+        if (NBR_DE_TOURS== tours_execut)
+        {
+            break;
+        }else 
+            tours_execut ++;
+
+
+        change_de_saisons(cycleSaison(jourNumero),&texture_background);
+       
     }
-    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    mesInsectes = clear_list(mesInsectes);  
+    print_list(mesInsectes);
+    free(jourNumero);
+    // ///////////////////////////////////////////////////////////////////////////////////////////////////
     SDL_DestroyWindow(window);
     quit(window, renderer,font);
     return 0;
