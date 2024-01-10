@@ -171,7 +171,7 @@ ListeInsectes initialisationEssaim(ListeInsectes listeInsectes, unsigned int nbA
         listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, NETTOYEUSE, ADULTE, 13, SANTE_MAX, false);
     }
     for(i = 0; i < nbNourrices; i++) {
-        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, NOURRICE, ADULTE, 13, SANTE_MAX, false);
+        listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, NOURRICE, ADULTE, 13, SANTE_MAX, false); //teste santé
     }
     for(i = 0; i < nbMagasinieres; i++) {
         listeInsectes = GENERATION_push_front_list(listeInsectes, TYPE_OUVRIERE, MAGASINIERE, ADULTE, 13, SANTE_MAX, false);
@@ -343,7 +343,7 @@ ListeInsectes pop_front_list(ListeInsectes listeInsectes){
 ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, unsigned int ID) {
     if (listeInsectes == NULL) {
         // Liste vide
-        return NULL;
+        printf ("la liste est bien vide kill fonctionne ");
     }
 
     ListeInsectes current = listeInsectes;
@@ -377,18 +377,19 @@ ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, unsigned int ID) {
 ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche){
     if(ruche->reserveMiel > 0 && ruche->reserveEau > 0 && listeInsectes->type == TYPE_OUVRIERE){
         listeInsectes->faim = false;
-        ruche->reserveMiel -= 1;
-        ruche->reserveEau -= 1;
+        ruche->reserveMiel -= 100;
+        ruche->reserveEau -= 100;
     }
     else if(ruche->reserveMiel > 0 && ruche->reserveEau > 0 && listeInsectes->type == TYPE_FAUX_BOURDON){
         listeInsectes->faim = false;
-        ruche->reserveMiel -= 1;
-        ruche->reserveEau -= 1;
+        ruche->reserveMiel -= 100;
+        ruche->reserveEau -= 100;
     }
     else if(ruche->reserveGeleeRoyale > 0 && ruche->reserveEau > 0 && listeInsectes->type == TYPE_REINE){
         listeInsectes->faim = false;
-        ruche->reserveGeleeRoyale -= 1;
-        ruche->reserveEau -= 1;
+        ruche->reserveGeleeRoyale -= 100;
+        ruche->reserveEau -= 100;
+        
     }  
     else if(listeInsectes->type == TYPE_OURSE || listeInsectes->type == TYPE_GUEPE){
         //implementer nourriture ou non des ourse/guepe ? rand nourriture trouver => agressivité  => rand ruche trouvé => attaque ruche
@@ -473,7 +474,6 @@ RuchePtr capaciteMaxRuche(RuchePtr ruche){
     }
     return ruche;
 }
-
 RuchePtr evenementJouranilerRuche(RuchePtr ruche){
     ruche->salete += 15;
 
@@ -660,6 +660,14 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
             insecteActuel = actionFauxBourdon(insecteActuel, saison);
             if (cycledeMort(insecteActuel))
             {
+                //teste pour s'avoir il sont mort de quoi 
+                if ( insecteActuel->sante == 0) {
+                printf("l'abeille ID: %d est morte de: santé\n ",insecteActuel->id);
+                }
+                if (insecteActuel->type == TYPE_OUVRIERE && insecteActuel->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J) {
+                printf("l'abeille ID: %d est morte de: vieillese\n",insecteActuel->id);
+
+                }
                 listeInsectes = Kill_Abeille(listeInsectes, insecteActuel->id);
             }
             reine_Va_Pondre = reineVaPondre(saison, insecteActuel);
@@ -679,7 +687,7 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
         }
         
         printf("_______________________________________________________________________________________________________\n\n");
-        //print_list(listeInsectes);
+        print_list(listeInsectes);
         printf("Jour numéro: %u\n", *jourNumero);
         printf("Saison: %s\n", SaisonsStrings[saison]);
         printf("Jour numéro: %u\n",*jourNumero);
