@@ -39,6 +39,7 @@
 #define COHESION_MAX 100
 #define COHESION_MIN 0
 
+//non implémenté
 #define EFFICACITE_MAX 100
 #define EFFICACITE_MIN 0
 #define EFFICACITER_PAR_DEFAUT 50
@@ -48,6 +49,14 @@
 #define CAPACITE_MAX_MIEL_g 1000 
 #define CAPACITE_MAX_GELEE_ROYALE_G 100 
 #define CAPACITE_MAX_EAU_ML 250 
+
+#define RECOLTE_POLLEN_J 100
+#define RECOLTE_EAU_J 100
+
+#define TRANSFORMATION_POLLEN_UTILISE_J 100
+#define TRANSFORMATION_POLLEN_EN_MIEL_J 100
+#define TRANSFORMATION_POLLEN_EN_GELEE_ROYAL_J 100
+
 
 #define NOMBRE_MAX_OUVRIERES 60000 
 #define NOMBRE_MAX_FAUX_BOURDONS 2000 
@@ -60,12 +69,12 @@
 #define USURE_JOURNALIERE_RUCHE 50
 #define SANTE_RUCHE_MAX 500
 #define SANTE_RUCHE_MIN 0 
-#define SANTE_RUCHE_REPARATION 10
+#define SANTE_RUCHE_REPARATION 1000
 
 #define SALETE_JOURNALIERE_RUCHE 50
 #define SALETE_MAX 1000
 #define SALETE_MIN 0
-#define SALETE_NETTOYAGE 10
+#define SALETE_NETTOYAGE 1000
 
 typedef enum Saisons {
     PRINTEMPS,
@@ -84,8 +93,6 @@ typedef struct Ruche {
     unsigned int reserveEau;
     unsigned int reservePollen;
     unsigned int reserveGeleeRoyale;
-    
-    unsigned int Nectar;
 
     unsigned int nombreOuvrieres;
     unsigned int nombreFauxBourdon;

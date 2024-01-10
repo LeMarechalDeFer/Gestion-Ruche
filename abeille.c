@@ -533,7 +533,7 @@ RuchePtr evenementJouranilerRuche(RuchePtr ruche){
 ListeInsectes actionOuvriere(ListeInsectes listeInsectes, RuchePtr ruche){
     if(listeInsectes->type == TYPE_OUVRIERE){
         switch(listeInsectes->data.ouvriere.role){
-            case NETTOYEUSE: //fonctionnelle
+            case NETTOYEUSE: //fontionnelle (teste unitaire effectué)
                 if(ruche->salete >= SALETE_MIN){
                     ruche->salete -= SALETE_NETTOYAGE;
                     printf("Nettoyeuse a fait son travail\n");
@@ -541,55 +541,48 @@ ListeInsectes actionOuvriere(ListeInsectes listeInsectes, RuchePtr ruche){
                 break;
             case NOURRICE:
                 
+
                 break;
-            case MAGASINIERE: 
+            case MAGASINIERE: //fontionnelle (teste unitaire effectué)
                 if(ruche->reservePollen > 0){
-                    ruche->reservePollen -= 5;
-                    ruche->reserveMiel += 8;
-                    ruche->reserveGeleeRoyale += 1;
+                    ruche->reservePollen -= TRANSFORMATION_POLLEN_UTILISE_J;
+                    ruche->reserveMiel += TRANSFORMATION_POLLEN_EN_MIEL_J;
+                    ruche->reserveGeleeRoyale += TRANSFORMATION_POLLEN_EN_GELEE_ROYAL_J;
                     printf("Magasiniere a fait son travail\n");
                 }
                 else{
-                    printf("Pas assez de pollen\n");
+                    printf("Pas assez de pollen pour notre Stakhanov en chef\n");
                 }
                 break;
-            case CIRIERE: //fonctionnelle
+            case CIRIERE: ///fontionnelle (teste unitaire effectué)
                 if(ruche->sante <= SANTE_RUCHE_MAX){
                     ruche->sante += SANTE_RUCHE_REPARATION;
                     printf("Ciriere a fait son travail\n");
                 }
                 else{
-                    printf("Sante ruche max\n");
+                    printf("Ruche santé max : Ciriere profite de ses RTT\n");
                 }
                 break;
 
-            case VENTILEUSE: 
+            case VENTILEUSE: //fontionnelle (teste unitaire effectué)
                 if(ruche->temperature > TEMPERATURE_IDEAL){
-                    printf("Ventileuse a fait son travail\n");
-                    printf("Avant travail ventileuse: %f\n", ruche->temperature);
-                    printf("TZS\n");
                     ruche->temperature -= TEMPERATURE_VENTILATION ;
-                    printf("Apres travail ventileuse: %f\n", ruche->temperature);
-                    
+                    printf("Ventileuse a fait son travail\n");
                 }
                 if(ruche->temperature < TEMPERATURE_IDEAL){
-                    printf("Ventileuse a fait son travail\n");
-                    printf("Avant travail ventileuse: %f\n", ruche->temperature);
-                    printf("TZS\n");
                     ruche->temperature += TEMPERATURE_VENTILATION ;
-                    printf("Apres travail ventileuse: %f\n", ruche->temperature);
+                    printf("Ventileuse a fait son travail\n");
                 }
                 else{
-                    printf("Temperature idéale\n");
+                    printf("Ruche temperature idéale : Ventilleuse profitede ses RTT\n");
                 }
                 break;
             case GARDIENNE:
 
                 break;
-                
-            case BUTINEUSE:
-                ruche->reservePollen += 5;
-                ruche->reserveEau += 5;
+            case BUTINEUSE: //fontionnelle (teste unitaire effectué)
+                ruche->reservePollen += RECOLTE_POLLEN_J;
+                ruche->reserveEau += RECOLTE_EAU_J;
                 printf("Butineuse a fait son travail\n");
 
                 break;
