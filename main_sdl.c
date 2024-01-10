@@ -16,23 +16,7 @@ int main()
     mesInsectes = initialisationEssaim(mesInsectes, 20);
     maRuche = initialisationRuche(maRuche);
 
-    /*
-    int NBR_DE_TOURS =45; //choisir le nombre de jours
-    for(int i=0;i<NBR_DE_TOURS;i++){
-        mesInsectes = tourDeSimulation(mesInsectes, maRuche, jourNumero);
-        if(mesInsectes  == NULL)
-        {
-        printf("Toute la colonie est morte\n");
-        printf("_______________________________________________________________________________________________________\n");
-        break;
-        }
-        delay(1000)
-    }
-    //print_list(mesInsectes);
-    mesInsectes = clear_list(mesInsectes);  
-    print_list(mesInsectes);
-    free(jourNumero);*/
-    // ///////////////////////////////////////////////////////////////////////////////////////////////////
+    
     init_TTF();
     SDL_Window* window = initSDL();
     //Uint32 Start_tick = SDL_GetTicks();                    // Chronomètre qui commence dès que le SDL init est en route
@@ -67,13 +51,13 @@ int main()
 
     SDL_FreeSurface(defaultSurface); // Libérez la surface, elle n'est plus nécessaire
 
-        int NBR_DE_TOURS =3000; //choisir le nombre de jours
+        int NBR_DE_TOURS =30; //choisir le nombre de jours
         int tours_execut =0;
     for(int i=0;i<NBR_DE_TOURS;i++)
     {
         
         
-        
+        program_launched = SDL_TRUE;
         SDL_Event action_utilisateur;
         
         while (SDL_PollEvent(&action_utilisateur))
@@ -81,49 +65,56 @@ int main()
             switch (action_utilisateur.type)
             {
                 case SDL_QUIT:
-                defaultSurface = SDL_LoadBMP("V.SDL/Assets/gameover.bmp");
-                if (!defaultSurface) {
-                    printf("Unable to load default gameover image! SDL_Error: %s\n", SDL_GetError());
-                } else {
-                    SDL_Texture* newTexture = SDL_CreateTextureFromSurface(renderer, defaultSurface);
-                    if (!newTexture) {
-                        printf("Unable to create texture from gameover image! SDL_Error: %s\n", SDL_GetError());
+                    SDL_RenderClear(renderer);
+
+                    // Charger et afficher l'image gameover
+                    SDL_Surface* gameOverSurface = SDL_LoadBMP("V.SDL/Assets/gameover.bmp");
+                    if (!gameOverSurface) {
+                        printf("Unable to load gameover image! SDL_Error: %s\n", SDL_GetError());
                     } else {
-                        if (texture_background) {
-                            SDL_DestroyTexture(texture_background); // Libérer l'ancienne texture
-                        }
-                        texture_background = newTexture; // Utiliser la nouvelle texture
+                        SDL_Texture* gameOverTexture = SDL_CreateTextureFromSurface(renderer, gameOverSurface);
+                        SDL_RenderCopy(renderer, gameOverTexture, NULL, NULL); // Afficher sur tout l'écran
+                        SDL_DestroyTexture(gameOverTexture);
                     }
-                    SDL_FreeSurface(defaultSurface); // Libérer la surface
-                }
-                SDL_Delay(200); // Temps de pause avant de quitter
-                program_launched = SDL_FALSE;
-                break;
+                    SDL_FreeSurface(gameOverSurface);
+
+                    // Mettre à jour l'écran
+                    SDL_RenderPresent(renderer);
+
+                    // Attendre avant de quitter
+                    SDL_Delay(300);
+                        SDL_DestroyWindow(window);
+
+                    program_launched = SDL_FALSE;
+                   
+                    break;
 
                 case SDL_KEYDOWN:
-                    if (action_utilisateur.key.keysym.sym == SDLK_ESCAPE)    // Quitter quand on appuie sur ECHAP
-                    {
-                            defaultSurface = SDL_LoadBMP("V.SDL/Assets/gameover.bmp");
-                        if (!defaultSurface) {
-                        printf("Unable to load default gameover image! SDL_Error: %s\n", SDL_GetError());
-                        } else {
-                        SDL_Texture* newTexture = SDL_CreateTextureFromSurface(renderer, defaultSurface);
-                        if (!newTexture) {
-                            printf("Unable to create texture from gameover image! SDL_Error: %s\n", SDL_GetError());
-                        } else {
-                            if (texture_background) {
-                                
-                            }
-                            texture_background = newTexture; // Utiliser la nouvelle texture
-                        }
-                        SDL_FreeSurface(defaultSurface); // Libérer la surface
-                        }   
-                        SDL_Delay(100); // Temps de pause avant de quitter
-                        program_launched = SDL_FALSE;
-                        break;
+                    if (action_utilisateur.key.keysym.sym == SDLK_ESCAPE) {
+                    // Effacer l'écran
+                    SDL_RenderClear(renderer);
+
+                    // Charger et afficher l'image gameover
+                    SDL_Surface* gameOverSurface = SDL_LoadBMP("V.SDL/Assets/gameover.bmp");
+                    if (!gameOverSurface) {
+                        printf("Unable to load gameover image! SDL_Error: %s\n", SDL_GetError());
+                    } else {
+                        SDL_Texture* gameOverTexture = SDL_CreateTextureFromSurface(renderer, gameOverSurface);
+                        SDL_RenderCopy(renderer, gameOverTexture, NULL, NULL); // Afficher sur tout l'écran
+                        SDL_DestroyTexture(gameOverTexture);
                     }
-                    else
-                        continue;
+                    SDL_FreeSurface(gameOverSurface);
+
+                    // Mettre à jour l'écran
+                    SDL_RenderPresent(renderer);
+
+                    // Attendre avant de quitter
+                    SDL_Delay(300);
+                        SDL_DestroyWindow(window);
+
+                    program_launched = SDL_FALSE;
+                    }
+                    break;
             }
             
            
@@ -131,7 +122,6 @@ int main()
         
         Display( i );
 
-        
         mesInsectes = tourDeSimulation(mesInsectes, maRuche, jourNumero);
         if(mesInsectes  == NULL)
         {
@@ -141,13 +131,8 @@ int main()
         SDL_Delay(10);
         
         change_de_saisons(cycleSaison(jourNumero),&texture_background);
-        
-    defaultSurface = SDL_LoadBMP("V.SDL/Assets/gameover.bmp"); // Remplacez par votre chemin d'accès
-    if (!defaultSurface) {
-        printf("Unable to load default gameover image! SDL_Error: %s\n", SDL_GetError());
-        // Gérez l'erreur comme vous préférez ici (par exemple, quitter le programme)
+       
     }
-    
     mesInsectes = clear_list(mesInsectes);  
     print_list(mesInsectes);
     free(jourNumero);
