@@ -52,11 +52,20 @@
 #define NOMBRE_MAX_OUVRIERES 60000 
 #define NOMBRE_MAX_FAUX_BOURDONS 2000 
 
-#define HUMIDITE_IDEAL 80 
 #define TEMPERATURE_IDEAL 35 
+#define TEMPERATURE_MIN -30
+#define TEMPERATURE_MAX 37
+#define TEMPERATURE_VENTILATION 12
 
+#define USURE_JOURNALIERE_RUCHE 50
 #define SANTE_RUCHE_MAX 500
 #define SANTE_RUCHE_MIN 0 
+#define SANTE_RUCHE_REPARATION 10
+
+#define SALETE_JOURNALIERE_RUCHE 50
+#define SALETE_MAX 1000
+#define SALETE_MIN 0
+#define SALETE_NETTOYAGE 10
 
 typedef enum Saisons {
     PRINTEMPS,
@@ -68,7 +77,7 @@ typedef enum Saisons {
 
 typedef struct Ruche {
     float temperature;
-    unsigned int salete;
+    int salete;
     unsigned int sante;
 
     unsigned int reserveMiel;
