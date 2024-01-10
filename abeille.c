@@ -404,33 +404,36 @@ ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, unsigned int ID) {
 }
 
 ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche){
-    if(ruche->reserveMiel > 0 && ruche->reserveEau > 0 && listeInsectes->type == TYPE_OUVRIERE){
+    
+    if(ruche->reserveMiel > 0 && ruche->reserveEau > 0 && listeInsectes->type == TYPE_OUVRIERE && listeInsectes->cycleCroissanceAbeilles == ADULTE){
         listeInsectes->faim = false;
-        ruche->reserveMiel -= 1;
-        ruche->reserveEau -= 1;
+        ruche->reserveMiel -= CONSOMMATION_MIEL_J;
+        ruche->reserveEau -= CONSOMMATION_EAU_J;
     }
-    else if(ruche->reserveMiel > 0 && ruche->reserveEau > 0 && listeInsectes->type == TYPE_FAUX_BOURDON){
+    else if(ruche->reserveMiel > 0 && ruche->reserveEau > 0 && listeInsectes->type == TYPE_FAUX_BOURDON && listeInsectes->cycleCroissanceAbeilles == ADULTE){
         listeInsectes->faim = false;
-        ruche->reserveMiel -= 1;
-        ruche->reserveEau -= 1;
+        ruche->reserveMiel -= CONSOMMATION_MIEL_J;
+        ruche->reserveEau -= CONSOMMATION_EAU_J;
     }
-    else if(ruche->reserveGeleeRoyale > 0 && ruche->reserveEau > 0 && listeInsectes->type == TYPE_REINE){
+    else if(ruche->reserveGeleeRoyale > 0 && ruche->reserveEau > 0 && listeInsectes->type == TYPE_REINE && listeInsectes->cycleCroissanceAbeilles == ADULTE){
         listeInsectes->faim = false;
-        ruche->reserveGeleeRoyale -= 1;
-        ruche->reserveEau -= 1;
+        ruche->reserveGeleeRoyale -= CONSOMMATION_GELEE_ROYALE_J;
+        ruche->reserveEau -= CONSOMMATION_EAU_J;
         
     }  
+    // else if(listeInsectes->cycleCroissanceAbeilles == LARVE || listeInsectes->cycleCroissanceAbeilles == PUPAISON || listeInsectes->cycleCroissanceAbeilles == OEUF){
+    //     printf("Nous verrons bien si les larves ont faim\n");
+    // }
     else if(listeInsectes->type == TYPE_OURSE || listeInsectes->type == TYPE_GUEPE){
         //implementer nourriture ou non des ourse/guepe ? rand nourriture trouver => agressivité  => rand ruche trouvé => attaque ruche
     }
-  /*  else if(ruche->reserveMiel > 0 && (listeInsectes->cycleCroissanceAbeilles == OEUF || listeInsectes->cycleCroissanceAbeilles == LARVE || listeInsectes->cycleCroissanceAbeilles == PUPAISON))
+    /*  else if(ruche->reserveMiel > 0 && (listeInsectes->cycleCroissanceAbeilles == OEUF || listeInsectes->cycleCroissanceAbeilles == LARVE || listeInsectes->cycleCroissanceAbeilles == PUPAISON))
     {
         listeInsectes->faim = false;
         ruche->reserveMiel -= 1;
         ruche->reserveEau -= 1;
     }*/
     else{
-        listeInsectes->faim = true;
         listeInsectes->sante -= 25;
         printf("L'abeille ID: %d n'a pas mangé\n",listeInsectes->id);
 
@@ -540,8 +543,18 @@ ListeInsectes actionOuvriere(ListeInsectes listeInsectes, RuchePtr ruche){
                 }
                 break;
             case NOURRICE:
-                
-
+                // Insecte *current = listeInsectes;
+                // while (current != NULL) {
+                //     if (current->cycleCroissanceAbeilles == LARVE && current->faim == true) {
+                //         if(ruche->reserveMiel > 0 && ruche->reserveEau > 0){
+                //             ruche->reserveMiel -= CONSOMMATION_MIEL_J;
+                //             ruche->reserveEau -= CONSOMMATION_EAU_J;
+                //             current->faim = false;
+                //             printf("Nourrice a nourrit la larve %d\n", current->id);
+                //         }
+                //     }
+                //     current = current->next;
+                // }
                 break;
             case MAGASINIERE: //fontionnelle (teste unitaire effectué)
                 if(ruche->reservePollen > 0){
@@ -717,11 +730,12 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
         
         while(insecteActuel != NULL)
         {
-            
+            listeInsectes->faim = true;
             insecteActuel = cycleCroissance(insecteActuel); 
-            insecteActuel = cycledeFaim(insecteActuel, ruche);
             insecteActuel = actionOuvriere(insecteActuel, ruche);
             insecteActuel = actionFauxBourdon(insecteActuel, saison);
+            insecteActuel = cycledeFaim(insecteActuel, ruche);
+            
             
             if (cycledeMort(insecteActuel))
             {
@@ -736,9 +750,9 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
             }
 
 
-            //listeInsectes = cycledeMort(insecteActuel, listeInsectes);
+            //listeInsectes = cycledeMort(insecteActuel, listeInsectes); refactorisation non fonctionnelle
             reine_Va_Pondre = reineVaPondre(saison, insecteActuel);
-            insecteActuel = competenceMaxAbeille(insecteActuel);
+            //insecteActuel = competenceMaxAbeille(insecteActuel); competence/xp non fonctionnelle
             
             insecteActuel = insecteActuel->next; 
         }
@@ -810,10 +824,10 @@ RuchePtr initialisationRuche()
     ruche->temperature = TEMPERATURE_IDEAL;
     ruche->sante = SANTE_RUCHE_MAX;
     ruche->salete = SALETE_MIN;
-    ruche->reserveMiel = 0;
-    ruche->reserveEau = 0;
-    ruche->reservePollen = 0;
-    ruche->reserveGeleeRoyale = 0;
+    ruche->reserveMiel = CAPACITE_INITIALE_MIEL_g;
+    ruche->reserveEau = CAPACITE_INITIALE_EAU_ML;
+    ruche->reservePollen = CAPACITE_INITIALE_POLLEN_G;
+    ruche->reserveGeleeRoyale = CAPACITE_INITIALE_GELEE_ROYALE_G;
     ruche->nombreOuvrieres = 0;
     ruche->nombreFauxBourdon = 0;
     return ruche;
