@@ -25,7 +25,7 @@ int main()
         printf("_______________________________________________________________________________________________________\n");
         break;
         }
-        
+    
     }
     //print_list(mesInsectes);
     mesInsectes = clear_list(mesInsectes);  
