@@ -320,6 +320,35 @@ bool cycledeMort(ListeInsectes insecte)
     return false;
 }
 
+
+// ListeInsectes cycledeMort(ListeInsectes insecteActuel, ListeInsectes listeInsectes)
+// {
+//     if (insecteActuel == NULL) {
+//         return insecteActuel;
+//     }
+//     if (insecteActuel->sante == 0) {
+//         printf("l'abeille ID: %d est morte de: santé\n ",insecteActuel->id);
+//         listeInsectes = Kill_Abeille(listeInsectes, insecteActuel->id);
+//         return insecteActuel;
+//     }
+//     if (insecteActuel->type == TYPE_OUVRIERE && insecteActuel->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J) {
+//         listeInsectes = Kill_Abeille(listeInsectes, insecteActuel->id);
+//         printf("l'abeille ID: %d est morte de: vieillese\n",insecteActuel->id);
+//         return insecteActuel;
+//     }
+
+//     if (insecteActuel->type == TYPE_REINE && insecteActuel->age >=DUREE_VIE_MAX_REINE_J) { //DUREE_VIE_MAX_REINE_J) {
+//         listeInsectes = Kill_Abeille(listeInsectes, insecteActuel->id);
+//         return insecteActuel;
+//     }
+//     if (insecteActuel->type == TYPE_FAUX_BOURDON && insecteActuel->age >=DUREE_VIE_MAX_FAUX_BOURDON_J) { //DUREE_VIE_MAX_REINE_J) {
+//         listeInsectes = Kill_Abeille(listeInsectes, insecteActuel->id);
+//         return insecteActuel;
+//     }
+
+//     return insecteActuel;
+// }
+
 ListeInsectes pop_front_list(ListeInsectes listeInsectes){
     ListeInsectes nouvelleTete = malloc(sizeof(Ouvriere));
     if(nouvelleTete == NULL){
@@ -377,18 +406,18 @@ ListeInsectes Kill_Abeille(ListeInsectes listeInsectes, unsigned int ID) {
 ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche){
     if(ruche->reserveMiel > 0 && ruche->reserveEau > 0 && listeInsectes->type == TYPE_OUVRIERE){
         listeInsectes->faim = false;
-        ruche->reserveMiel -= 100;
-        ruche->reserveEau -= 100;
+        ruche->reserveMiel -= 1;
+        ruche->reserveEau -= 1;
     }
     else if(ruche->reserveMiel > 0 && ruche->reserveEau > 0 && listeInsectes->type == TYPE_FAUX_BOURDON){
         listeInsectes->faim = false;
-        ruche->reserveMiel -= 100;
-        ruche->reserveEau -= 100;
+        ruche->reserveMiel -= 1;
+        ruche->reserveEau -= 1;
     }
     else if(ruche->reserveGeleeRoyale > 0 && ruche->reserveEau > 0 && listeInsectes->type == TYPE_REINE){
         listeInsectes->faim = false;
-        ruche->reserveGeleeRoyale -= 100;
-        ruche->reserveEau -= 100;
+        ruche->reserveGeleeRoyale -= 1;
+        ruche->reserveEau -= 1;
         
     }  
     else if(listeInsectes->type == TYPE_OURSE || listeInsectes->type == TYPE_GUEPE){
@@ -403,6 +432,7 @@ ListeInsectes cycledeFaim(ListeInsectes listeInsectes, RuchePtr ruche){
     else{
         listeInsectes->faim = true;
         listeInsectes->sante -= 25;
+        printf("L'abeille ID: %d n'a pas mangé\n",listeInsectes->id);
 
     }
     return listeInsectes;
@@ -462,31 +492,29 @@ ListeInsectes competenceMaxAbeille(ListeInsectes listeInsectes){
 RuchePtr capaciteMaxRuche(RuchePtr ruche){
     if(ruche->reserveMiel > CAPACITE_MAX_MIEL_g){
         ruche->reserveMiel = CAPACITE_MAX_MIEL_g;
+        printf("La ruche déborde de miel\n");
     }
     if(ruche->reserveEau > CAPACITE_MAX_EAU_ML){
         ruche->reserveEau = CAPACITE_MAX_EAU_ML;
+        printf("La ruche déborde d'eau\n");
     }
     if(ruche->reservePollen > CAPACITE_MAX_POLLEN_G){
         ruche->reservePollen = CAPACITE_MAX_POLLEN_G;
+        printf("La ruche déborde de pollen\n");
     }
     if(ruche->reserveGeleeRoyale > CAPACITE_MAX_GELEE_ROYALE_G){
         ruche->reserveGeleeRoyale = CAPACITE_MAX_GELEE_ROYALE_G;
+        printf("La ruche déborde de gelee royale\n");
     }
     return ruche;
 }
 RuchePtr evenementJouranilerRuche(RuchePtr ruche){
-    ruche->salete += 15;
+    ruche->salete += 2;
 
-    if (ruche->sante >= 30) {
-        ruche->sante -= 30;
+    if (ruche->sante >= 50) {
+        ruche->sante -= 50;
     } else {
         ruche->sante = 0;
-    }
-
-    if (ruche->reservePollen >= 50) {
-        ruche->reservePollen -= 50;
-    } else {
-        ruche->reservePollen = 0;
     }
 
     return ruche;
@@ -630,6 +658,21 @@ ListeInsectes actionFauxBourdon(ListeInsectes listeInsectes, Saisons saison){
     return listeInsectes;
 }
 
+bool conditionMortRuche(RuchePtr ruche, ListeInsectes listeInsectes){
+    if(ruche->sante == 0 || ruche->salete == 100){
+        printf("La ruche est morte\n");
+        return true;
+    }
+    else if (list_length(listeInsectes) == 0){
+        printf("La ruche est morte\n");
+        return true;
+    }
+    else{
+        printf("La ruche est en vie\n");
+        return false;
+    }
+}
+
 
 
 ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsigned int *jourNumero)
@@ -658,34 +701,61 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
             insecteActuel = cycledeFaim(insecteActuel, ruche);
             insecteActuel = actionOuvriere(insecteActuel, ruche);
             insecteActuel = actionFauxBourdon(insecteActuel, saison);
+            
             if (cycledeMort(insecteActuel))
             {
-                //teste pour s'avoir il sont mort de quoi 
+
                 if ( insecteActuel->sante == 0) {
                 printf("l'abeille ID: %d est morte de: santé\n ",insecteActuel->id);
                 }
                 if (insecteActuel->type == TYPE_OUVRIERE && insecteActuel->age >= DUREE_VIE_MAX_OUVRIERE_ETE_J) {
-                printf("l'abeille ID: %d est morte de: vieillese\n",insecteActuel->id);
-
+                    printf("l'abeille ID: %d est morte de: vieillese\n",insecteActuel->id);
                 }
                 listeInsectes = Kill_Abeille(listeInsectes, insecteActuel->id);
             }
+
+
+            //listeInsectes = cycledeMort(insecteActuel, listeInsectes);
             reine_Va_Pondre = reineVaPondre(saison, insecteActuel);
-            //printf("reine_Va_Pondre: %s\n", reine_Va_Pondre ? "Oui" : "Non");
+            insecteActuel = competenceMaxAbeille(insecteActuel);
+            
             insecteActuel = insecteActuel->next; 
         }
-        listeInsectes = nombreMaxAbeille(listeInsectes);
+
         unsigned int tailleListeAfter = list_length(listeInsectes); 
-        nombreMort += (tailleListe - tailleListeAfter);
+        nombreMort = nombreMortJ(tailleListe, tailleListeAfter);
 
         listeInsectes = actionReine(listeInsectes, reine_Va_Pondre);
-        
-        
+        //listeInsectes = nombreMaxAbeille(listeInsectes);           A TESTER
+        //ruche = capaciteMaxRuche(ruche);                           NON FONCTIONNELLE
 
-        if(reine_Va_Pondre == true){
-            nombreNaissance = PONTE_OUVRIERE_JOUR + PONTE_FAUX_BOURDON_JOUR;
-        }
+        nombreNaissance = nombreNaissanceJ(reine_Va_Pondre);
         
+        affichageTour(listeInsectes, ruche, jourNumero, nombreNaissance, nombreMort, saison);
+
+        return listeInsectes;
+    }
+            
+}
+
+unsigned int nombreMortJ(unsigned int tailleListe, unsigned int tailleListeAfter){
+    unsigned int nombreMort = 0;
+    nombreMort += (tailleListe - tailleListeAfter);
+    return nombreMort;
+}
+
+unsigned int nombreNaissanceJ(bool reine_Va_Pondre){
+    unsigned int nombreNaissance = 0;
+    if(reine_Va_Pondre == true){
+        nombreNaissance = PONTE_OUVRIERE_JOUR + PONTE_FAUX_BOURDON_JOUR;
+    }
+    return nombreNaissance;
+}
+
+
+
+void affichageTour(ListeInsectes listeInsectes, RuchePtr ruche, unsigned int *jourNumero, unsigned int nombreNaissance, unsigned int nombreMort, Saisons saison){
+
         printf("_______________________________________________________________________________________________________\n\n");
         print_list(listeInsectes);
         printf("Jour numéro: %u\n", *jourNumero);
@@ -696,15 +766,10 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
         printf("Le nombre de naissances: %u\n", nombreNaissance);
         printf("Le nombre de morts: %u\n", nombreMort);
         printf("Nourriture ruche: Miel: %u, Eau: %u, Pollen: %u, Gelee Royale: %u\n", ruche->reserveMiel, ruche->reserveEau, ruche->reservePollen, ruche->reserveGeleeRoyale);
-        printf("Statistiques ruche: Temperature: %f, Sante: %f, Salete: %f\n", ruche->temperature, ruche->sante, ruche->salete);
+        printf("Statistiques ruche: Temperature: %f, Sante: %u, Salete: %u\n", ruche->temperature, ruche->sante, ruche->salete);
 
         printf("_______________________________________________________________________________________________________\n");
-
-        return listeInsectes;
-    }
-            
 }
-
 
 
 //initialisation de la ruche

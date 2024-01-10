@@ -68,8 +68,8 @@ typedef enum Saisons {
 
 typedef struct Ruche {
     float temperature;
-    float salete;
-    float sante;
+    unsigned int salete;
+    unsigned int sante;
 
     unsigned int reserveMiel;
     unsigned int reserveEau;
@@ -181,6 +181,7 @@ Saisons cycleSaison(unsigned int *jourNumero);
 ListeInsectes actionOuvriere (ListeInsectes listeInsectes, RuchePtr ruche);
 
 
+//ListeInsectes cycledeMort(ListeInsectes insecteActuel, ListeInsectes listeInsectes);
 bool cycledeMort(ListeInsectes insecte);
 
 ListeInsectes actionReine(ListeInsectes listeInsectes, bool reine_Va_Pondre);
@@ -208,6 +209,10 @@ ListeInsectes pop_front_list(ListeInsectes listeInsectes);
 bool reineVaPondre(Saisons saison, ListeInsectes listeInsectes);
 bool parcoursListeTrouverReine(ListeInsectes listeInsectes);
 ListeInsectes actionFauxBourdon(ListeInsectes listeInsectes, Saisons saison);
+void affichageTour(ListeInsectes listeInsectes, RuchePtr ruche, unsigned int *jourNumero, unsigned int nombreNaissance, unsigned int nombreMort, Saisons saison);
+unsigned int nombreMortJ(unsigned int tailleListe, unsigned int tailleListeAfter);
+unsigned int nombreNaissanceJ(bool reine_Va_Pondre);
+bool conditionMortRuche(RuchePtr ruche, ListeInsectes listeInsectes);
 
 /*
 - Cycle de vie : naissance croissance mort 
@@ -218,7 +223,7 @@ ListeInsectes actionFauxBourdon(ListeInsectes listeInsectes, Saisons saison);
 - Activité journaliere des ouvrieres avec ces sous categoriccccces 
 - Activité journaliere faux bourdons (hiver expulse, ete en quete de reine)
 - Ruche
-- Temperature
+- Temperature   
 - Prédateurs/ Nuisibles
 */
 
