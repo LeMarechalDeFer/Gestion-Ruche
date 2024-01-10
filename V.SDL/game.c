@@ -51,8 +51,8 @@ typedef struct{
 
 Saison_SDL saisons_sdl[] = {
     {"Spring", "V.SDL/Assets/back_spring.bmp"},  // Assurez-vous que ce chemin est correct
-    {"Summer", "V.SDL/Assets/back_autumn.bmp"},  // et que l'image existe bien ici
     {"Autumn", "V.SDL/Assets/back_summer.bmp"},
+    {"Summer", "V.SDL/Assets/back_autumn.bmp"},  // et que l'image existe bien ici
     {"Winter", "V.SDL/Assets/back_winter.bmp"}
 };
 
@@ -108,6 +108,9 @@ void change_saisons(int seasonIndex, SDL_Texture **texture_background) {
 void change_de_saisons(int saisonIndex,SDL_Texture **texture_background)
 {
 
+
+
+    saisonIndex = saisonIndex % 4; // 4 saisons
     // Libère l'ancienne texture si elle existe
     if (*texture_background != NULL) {
         SDL_DestroyTexture(*texture_background);
@@ -128,28 +131,30 @@ void change_de_saisons(int saisonIndex,SDL_Texture **texture_background)
     } else {
         printf("Season changed to: %s\n", saisons_sdl[saisonIndex].seasonName);
     }
-
-
-
-
-
-
-
-
-   
-    
+ 
 }
 
-void Display(float elapsed_time)
+
+
+
+void Display(int elapsed_time)
 {
-    // Charger la police et préparer le texte du timer
+
+     // Nettoyer l'écran avec une couleur de fond noire
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
     TTF_Font* font = TTF_OpenFont("V.SDL/Assets/Roboto-BlackItalic.ttf", 24);
     if (!font) {
         SDL_ExitWithError("Failed to load font");
     }
 
+    
+    
+
+ 
     char timeText[100];
-    sprintf(timeText, "Time: %.1f seconds", elapsed_time);
+    sprintf(timeText, "DATE: %d J", elapsed_time);
     SDL_Color color = {0, 0, 0, 255}; // Couleur blanche pour la police
     SDL_Surface* surface_Timer = TTF_RenderText_Solid(font, timeText, color);
     if (!surface_Timer) {
@@ -161,9 +166,7 @@ void Display(float elapsed_time)
     }
     SDL_FreeSurface(surface_Timer); // Libérer la surface car elle n'est plus nécessaire
 
-    // Nettoyer l'écran avec une couleur de fond noire
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
+   
 
     // Dessiner la texture de fond
     SDL_Rect backgroundRect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT}; // Couvre toute la fenêtre
@@ -175,7 +178,7 @@ void Display(float elapsed_time)
         printf("No background texture to display.\n");
     }
     // Dessiner le timer
-    SDL_Rect timerRect = {400, 0, 200, 50}; // Position et taille du timer
+    SDL_Rect timerRect = {250, 0, 200, 50}; // Position et taille du timer
     if (SDL_RenderCopy(renderer, texture_Timer, NULL, &timerRect) != 0) {
         SDL_ExitWithError("Failed to render timer texture");
     }

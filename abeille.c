@@ -690,7 +690,6 @@ ListeInsectes tourDeSimulation(ListeInsectes listeInsectes, RuchePtr ruche, unsi
         print_list(listeInsectes);
         printf("Jour numéro: %u\n", *jourNumero);
         printf("Saison: %s\n", SaisonsStrings[saison]);
-        printf("Jour numéro: %u\n",*jourNumero);
         printf("Temperature: %f\n", ruche->temperature);
         printf("Taille de la liste: %u\n", list_length(listeInsectes));
         printf("Le nombre de naissances: %u\n", nombreNaissance);
