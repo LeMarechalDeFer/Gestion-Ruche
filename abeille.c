@@ -846,8 +846,7 @@ void affichageTour(ListeInsectes listeInsectes,
 
         printf("Jour numéro: %u\n", *jourNumero);
         printf("Saison: %s\n", SaisonsStrings[saison]);
-        printf("Jour numéro: %u\n",*jourNumero);
-        printf("Temperature: %f\n", temperatureJournee);
+
         printf("Taille de la liste: %u\n", list_length(listeInsectes));
         printf("Le nombre de naissances: %u\n", nombreNaissance);
         printf("Le nombre de morts: %u\n", nombreMort);

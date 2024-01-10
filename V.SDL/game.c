@@ -5,12 +5,10 @@
     SDL_RENDERER_TARGETTEXTURE (rendu selon texture)
 
 */
-/* gcc main.c -o SDL -I/usr/include/SDL2 -I/usr/include/SDL2_image -I/usr/include/SDL2_ttf -L/usr/lib -lSDL2 -lSDL2_ima
-ge -lSDL2_ttf */
+/* gcc main.c -o SDL -lSDL2 -lSDL2_image -lSDL2_ttf */
 
 
-#include "Config/SDL.h"
-#include "Config/Constantes.h"
+#include "SDL.h"
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
@@ -39,23 +37,23 @@ extern SDL_Texture* texture_background;
 #define NB_BEES 10
 
 void SDL_ExitWithError(const char *message);
-typedef struct Ruche {
+typedef struct Ruche_SDL {
     float W;    // Largeur
     float X;    // Postion X
     float Y;    // Position Y
     float Z;    // Hauteur
-} Ruche;
+} Ruche_SDL;
 
 typedef struct{
     const char* seasonName;
     const char* backgroundImagePath;
-}Saison;
+}Saison_SDL;
 
-Saison seasons[] = {
-    {"Spring", "Assets/back_spring.bmp"},  // Assurez-vous que ce chemin est correct
-    {"Summer", "Assets/back_autumn.bmp"},  // et que l'image existe bien ici
-    {"Autumn", "Assets/back_summer.bmp"},
-    {"Winter", "Assets/back_winter.bmp"}
+Saison_SDL saisons_sdl[] = {
+    {"Spring", "V.SDL/Assets/back_spring.bmp"},  // Assurez-vous que ce chemin est correct
+    {"Autumn", "V.SDL/Assets/back_summer.bmp"},
+    {"Summer", "V.SDL/Assets/back_autumn.bmp"},  // et que l'image existe bien ici
+    {"Winter", "V.SDL/Assets/back_winter.bmp"}
 };
 
 //Ruche ruches[BEES];
@@ -63,7 +61,7 @@ void load_bee_texture()
 {   for(int i = 1; i<= 4;i++)
     {
         char filePath[50];
-        snprintf(filePath, sizeof(filePath), "Assets/Position_%d.bmp", i );
+        snprintf(filePath, sizeof(filePath), "V.SDL/Assets/Position_%d.bmp", i );
 
         SDL_Surface* BEE_surface = SDL_LoadBMP(filePath);
         if (!BEE_surface) {
@@ -81,6 +79,7 @@ void load_bee_texture()
         //SDL_FreeTexture() ; 
     }
 }
+/*
 void change_saisons(int seasonIndex, SDL_Texture **texture_background) {
     // Assurez-vous que l'index de saison est valide
     seasonIndex = seasonIndex % 4; // 4 saisons
@@ -91,7 +90,7 @@ void change_saisons(int seasonIndex, SDL_Texture **texture_background) {
     }
 
     // Charge l'image correspondante dans la texture
-    SDL_Surface *tempSurface = SDL_LoadBMP(seasons[seasonIndex].backgroundImagePath);
+    SDL_Surface *tempSurface = SDL_LoadBMP(saisons_sdl[seasonIndex].backgroundImagePath);
     if (tempSurface == NULL) {
         printf("Could not load image: %s\n", SDL_GetError());
         return;
@@ -103,20 +102,59 @@ void change_saisons(int seasonIndex, SDL_Texture **texture_background) {
     if (*texture_background == NULL) {
         printf("Could not create texture: %s\n", SDL_GetError());
     } else {
-        printf("Season changed to: %s\n", seasons[seasonIndex].seasonName);
+        printf("Season changed to: %s\n", saisons_sdl[seasonIndex].seasonName);
     }
+}*/
+void change_de_saisons(int saisonIndex,SDL_Texture **texture_background)
+{
+
+
+
+    saisonIndex = saisonIndex % 4; // 4 saisons
+    // Libère l'ancienne texture si elle existe
+    if (*texture_background != NULL) {
+        SDL_DestroyTexture(*texture_background);
+    }
+
+    // Charge l'image correspondante dans la texture
+    SDL_Surface *tempSurface = SDL_LoadBMP(saisons_sdl[saisonIndex].backgroundImagePath);
+    if (tempSurface == NULL) {
+        printf("Could not load image: %s\n", SDL_GetError());
+        return;
+    }
+
+    *texture_background = SDL_CreateTextureFromSurface(renderer, tempSurface);
+    SDL_FreeSurface(tempSurface);  // Libérer la surface temporaire après la création de la texture
+
+    if (*texture_background == NULL) {
+        printf("Could not create texture: %s\n", SDL_GetError());
+    } else {
+        printf("Season changed to: %s\n", saisons_sdl[saisonIndex].seasonName);
+    }
+ 
 }
 
-void Display(float elapsed_time)
+
+
+
+void Display(int elapsed_time)
 {
-    // Charger la police et préparer le texte du timer
-    TTF_Font* font = TTF_OpenFont("Config/Roboto-BlackItalic.ttf", 24);
+
+     // Nettoyer l'écran avec une couleur de fond noire
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    TTF_Font* font = TTF_OpenFont("V.SDL/Assets/Roboto-BlackItalic.ttf", 24);
     if (!font) {
         SDL_ExitWithError("Failed to load font");
     }
 
+    
+    
+
+ 
     char timeText[100];
-    sprintf(timeText, "Time: %.1f seconds", elapsed_time);
+    sprintf(timeText, "DATE: %d J", elapsed_time);
     SDL_Color color = {0, 0, 0, 255}; // Couleur blanche pour la police
     SDL_Surface* surface_Timer = TTF_RenderText_Solid(font, timeText, color);
     if (!surface_Timer) {
@@ -128,9 +166,7 @@ void Display(float elapsed_time)
     }
     SDL_FreeSurface(surface_Timer); // Libérer la surface car elle n'est plus nécessaire
 
-    // Nettoyer l'écran avec une couleur de fond noire
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
+   
 
     // Dessiner la texture de fond
     SDL_Rect backgroundRect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT}; // Couvre toute la fenêtre
@@ -142,7 +178,7 @@ void Display(float elapsed_time)
         printf("No background texture to display.\n");
     }
     // Dessiner le timer
-    SDL_Rect timerRect = {400, 0, 200, 50}; // Position et taille du timer
+    SDL_Rect timerRect = {250, 0, 200, 50}; // Position et taille du timer
     if (SDL_RenderCopy(renderer, texture_Timer, NULL, &timerRect) != 0) {
         SDL_ExitWithError("Failed to render timer texture");
     }
@@ -151,14 +187,15 @@ void Display(float elapsed_time)
     SDL_FreeSurface(Ruche_surface);
 
     SDL_Rect ruche_position;
+    ruche_position.x = 100;
+    ruche_position.y = 260;
     if (SDL_QueryTexture(Ruche_texture, NULL,NULL,&ruche_position.w, &ruche_position.h)!= 0)
     {
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         SDL_ExitWithError("Failed to load Hive texture");
     }
-    ruche_position.x = 20;
-    ruche_position.y = 240;
+   
 
     if(SDL_RenderCopy(renderer,Ruche_texture,NULL,&ruche_position))
     {
@@ -189,6 +226,9 @@ void Display(float elapsed_time)
     // Libération des ressources
     SDL_DestroyTexture(texture_Timer); // Libérer la texture du timer
     TTF_CloseFont(font); // Fermer la police
+
+
+
 }
 
 SDL_Window* initSDL()
