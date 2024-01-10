@@ -85,8 +85,7 @@ int main()
                     SDL_Delay(300);
                         SDL_DestroyWindow(window);
 
-                    program_launched = SDL_FALSE;
-                   
+                    i= NBR_DE_TOURS;                       
                     break;
 
                 case SDL_KEYDOWN:
@@ -112,7 +111,7 @@ int main()
                     SDL_Delay(300);
                         SDL_DestroyWindow(window);
 
-                    program_launched = SDL_FALSE;
+                    i= NBR_DE_TOURS;
                     }
                     break;
             }

@@ -844,10 +844,8 @@ void affichageTour(ListeInsectes listeInsectes,
         printf("_______________________________________________________________________________________________________\n\n");
         //print_list(listeInsectes);
 
-        printf("Jour numéro: %u\n", *jourNumero);
+        
         printf("Saison: %s\n", SaisonsStrings[saison]);
-        printf("Jour numéro: %u\n",*jourNumero);
-        printf("Temperature: %f\n", temperatureJournee);
         printf("Taille de la liste: %u\n", list_length(listeInsectes));
         printf("Le nombre de naissances: %u\n", nombreNaissance);
         printf("Le nombre de morts: %u\n", nombreMort);
@@ -857,14 +855,6 @@ void affichageTour(ListeInsectes listeInsectes,
         printf("_______________________________________________________________________________________________________\n");
 }
 
-void delay(int secondes) {
-    int milli_secondes = 1000 * secondes;
-  
-    clock_t start_time = clock();
-    
-    while (clock() < start_time + milli_secondes)
-        ;
-}
 
 //initialisation de la ruche
 RuchePtr initialisationRuche()
