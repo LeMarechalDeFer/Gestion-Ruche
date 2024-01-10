@@ -142,10 +142,7 @@ int main()
         
         change_de_saisons(cycleSaison(jourNumero),&texture_background);
         
-    defaultSurface = SDL_LoadBMP("V.SDL/Assets/gameover.bmp"); // Remplacez par votre chemin d'accès
-    if (!defaultSurface) {
-        printf("Unable to load default gameover image! SDL_Error: %s\n", SDL_GetError());
-        // Gérez l'erreur comme vous préférez ici (par exemple, quitter le programme)
+    
     }
     
     mesInsectes = clear_list(mesInsectes);  
