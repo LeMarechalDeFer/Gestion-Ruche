@@ -9,8 +9,8 @@
 ge -lSDL2_ttf */
 
 
-#include "Config/SDL.h"
-#include "Config/Constantes.h"
+#include "SDL.h"
+
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
@@ -52,10 +52,10 @@ typedef struct{
 }Saison;
 
 Saison seasons[] = {
-    {"Spring", "Assets/back_spring.bmp"},  // Assurez-vous que ce chemin est correct
-    {"Summer", "Assets/back_autumn.bmp"},  // et que l'image existe bien ici
-    {"Autumn", "Assets/back_summer.bmp"},
-    {"Winter", "Assets/back_winter.bmp"}
+    {"Spring", "V.SDL/Assets/back_spring.bmp"},  // Assurez-vous que ce chemin est correct
+    {"Summer", "V.SDL/Assets/back_autumn.bmp"},  // et que l'image existe bien ici
+    {"Autumn", "V.SDL/Assets/back_summer.bmp"},
+    {"Winter", "V.SDL/Assets/back_winter.bmp"}
 };
 
 //Ruche ruches[BEES];
