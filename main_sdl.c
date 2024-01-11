@@ -51,7 +51,7 @@ int main()
 
     SDL_FreeSurface(defaultSurface); // Libérez la surface, elle n'est plus nécessaire
 
-        int NBR_DE_TOURS =30; //choisir le nombre de jours
+        int NBR_DE_TOURS =300; //choisir le nombre de jours
         int tours_execut =0;
     for(int i=0;i<NBR_DE_TOURS;i++)
     {

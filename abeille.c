@@ -842,7 +842,7 @@ void affichageTour(ListeInsectes listeInsectes,
                     float temperatureJournee){
 
         printf("_______________________________________________________________________________________________________\n\n");
-        //print_list(listeInsectes);
+        print_list(listeInsectes);
 
         
         printf("Saison: %s\n", SaisonsStrings[saison]);
